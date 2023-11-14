@@ -20,3 +20,14 @@
     width: 2rem;
     margin-left: 1rem;
 }
+.procesess-item{
+    display: flex;
+    flex-direction: column;
+}
+.processes-options{
+    display: flex;
+    justify-content: center;
+}
+.optionItem{
+    margin: 0.2rem;
+}
