@@ -1,0 +1,22 @@
+.procesess{
+    display: flex;
+    flex-direction: column;
+
+}
+.processes-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.procesess-item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10rem;
+    background-color: beige;
+}
+.papelera-container{
+    width: 2rem;
+    margin-left: 1rem;
+}

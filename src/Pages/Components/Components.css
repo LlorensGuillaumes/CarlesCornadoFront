@@ -1,0 +1,74 @@
+.component{
+    display: flex;
+    flex-direction: column;
+}
+.component-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    }
+    
+.components-container_component{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    align-items: center;
+    background-color: beige;
+    margin: 2rem;
+    border-radius: 2rem;
+}
+.component-detail-container{
+    display: flex;
+    flex-direction: column;
+    padding: 5rem;
+    padding-left: 5rem;
+    width: 85%;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    /* top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+    z-index: 5;
+    background-color: beige;
+    border-radius: 2rem;
+}
+.list-check{
+    display: flex;
+    width: 100%
+}
+.optionsSelector{
+    display: flex;
+    justify-content: space-around;
+    max-height: 250px;
+    overflow: auto;
+}
+.checkbox-style{
+    margin-right: 0.5rem;
+} 
+.fix{
+    position: fixed;
+}
+.headboard{
+    display: flex;
+    justify-content: space-around;
+}
+.headboard p {
+    width: 33%;
+}
+.list-container{
+    width: 30%;
+}
+
+.headbord-filter{
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid black;
+    padding-bottom: 0.5rem;
+}
+.headbord-filter input{
+    width: 20%;
+    padding: 0.2rem;
+    border-radius: 2rem;
+    border: none;
+}
