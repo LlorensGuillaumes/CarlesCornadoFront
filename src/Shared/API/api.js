@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://safidentback.onrender.com";
 
 const api = {
     get: async(endpoint) => {
