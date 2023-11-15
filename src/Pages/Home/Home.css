@@ -1,0 +1,16 @@
+.home_container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+.home_item{
+    width: 30%;
+    height: 10rem;
+    background-color: beige;
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
