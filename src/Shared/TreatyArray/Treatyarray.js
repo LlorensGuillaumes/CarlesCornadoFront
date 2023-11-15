@@ -8,7 +8,7 @@ dropDuplicatesAndEmpty: (array) => {
     const uniqueArray = Array.from(new Set(array));
     const nonEmptyArray = uniqueArray.filter(item => item !== '');
     return nonEmptyArray;
-}
+},
 };
 
 
