@@ -26,6 +26,9 @@ return (
     <div className="link home_item">
     <h1 onClick={()=>{navigate('/processes')}}>PROCESSOS</h1>
     </div>
+    <div className="link home_item">
+    <h1 onClick={()=>{navigate('/supplies')}}>APROVISIONAMENTS</h1>
+    </div>
     </div>
     );
 };

@@ -7,6 +7,7 @@ import Components from "./Pages/Components/Components";
 import Processes from "./Pages/Processes/Processes";
 import Header from "./Pages/Header/Header";
 import Products from "./Pages/Products/Products";
+import Suplies from "./Pages/Supplies/Suplies";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/components" element={<Components/>}/>
           <Route path="/processes" element={<Processes/>}/>
           <Route path="/products" element={<Products/>}/>
+          <Route path="/supplies" element={<Suplies/>}/>
           <Route path="/" element={<Home />} />
         </Routes>
       </div>
