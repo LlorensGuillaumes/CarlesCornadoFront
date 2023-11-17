@@ -1,0 +1,22 @@
+.purchases_list{
+    display: flex;
+
+}
+.purchases_list-item{
+    display: flex;
+}
+.purchase_number{
+width: 15%;
+}
+.purchase_date{
+width: 10%;
+}
+.purchase_provider{
+width: 30%;
+}
+.purchase_total{
+width: 10%;
+}
+.order_detail{
+    position: absolute;
+}
