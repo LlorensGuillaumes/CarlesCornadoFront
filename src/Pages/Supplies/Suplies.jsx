@@ -107,7 +107,7 @@ const Suplies = () => {
             >
                 <p>{supply.description}</p>
                 <p>{supply.code}</p>
-                <p>{supply.idProvider.name}</p>
+                <p>{supply.idProvider.name || ""}</p>
                 <p>{supply.price} €</p>
     
                 <div className="papelera-container">

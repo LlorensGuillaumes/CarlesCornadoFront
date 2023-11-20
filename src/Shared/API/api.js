@@ -1,5 +1,5 @@
-const BASE_URL = "https://safidentback.onrender.com";
-//const BASE_URL = "http://localhost:8000";
+//const BASE_URL = "https://safidentback.onrender.com";
+const BASE_URL = "http://localhost:8000";
 
 const api = {
 get: async(endpoint) => {
@@ -54,7 +54,7 @@ put: async (endpoint, body) => {
 delete: async (endpoint) => {
     try {
     const response = await fetch(BASE_URL + endpoint, {
-    method: "DELETE",
+    method: "PUT",
     headers: {
         "Content-Type": "application/json",
     },

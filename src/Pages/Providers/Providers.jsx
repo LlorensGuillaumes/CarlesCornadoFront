@@ -97,6 +97,7 @@ const Providers = () => {
     console.log(newProvider);
 
     if (drop) {
+      alert('drop')
       api
         .delete(`/providers/delete/${providerSelected._id}`)
         .then((response) => {

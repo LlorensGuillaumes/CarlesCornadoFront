@@ -61,7 +61,7 @@ return (
         <div key={index} className='purchases_list-item'>
         <p className='purchase_number'>{item.orderNumber}</p>
         <p className='purchase_date'>{item.date}</p>
-        <p className='purchase_provider'>{item.provider.name}</p>
+        <p className='purchase_provider'>{item.provider.name || ''}</p>
         <p className='purchase_total'>{item.total}€</p>
         <div 
         className='optionBtn link'
@@ -80,7 +80,7 @@ return (
     <div className='order_detail'>
     <p>{purchaseOrderSelected.date}</p>
     <p>{purchaseOrderSelected.orderNumber}</p>
-    <p>{purchaseOrderSelected.provider.name}</p>
+    <p>{purchaseOrderSelected.provider.name || ''}</p>
     </div>
     
     
