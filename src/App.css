@@ -9,6 +9,9 @@ img{
 .optionBtn{
   width: 3rem;
 }
+.optionBtnList{
+  width: 1.6rem;
+}
 p{
   margin: 0px;
 }

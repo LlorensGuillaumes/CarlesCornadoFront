@@ -9,6 +9,7 @@ import Header from "./Pages/Header/Header";
 import Products from "./Pages/Products/Products";
 import Suplies from "./Pages/Supplies/Suplies";
 import PurchaseOrder from "./Pages/PurchaseOrder/PurchaseOrder";
+import AssemblyOrder from "./Pages/AssemblyOrder/AssemblyOrder";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/supplies" element={<Suplies />} />
             <Route path="/purchase_order" element={<PurchaseOrder />} />
+            <Route path="/assembly_order" element={<AssemblyOrder/>}/>
           </Routes>
         </div>
       </div>

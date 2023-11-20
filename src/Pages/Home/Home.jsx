@@ -49,6 +49,11 @@ return (
         setItemSelected(8)
         navigate('/purchase_order')}}>ORDRES DE COMPRA</h3>
     </div>
+    <div className={`link home_item ${itemSelected === 9 ? 'selected' : null}`}>
+    <h3 onClick={()=>{
+        setItemSelected(9)
+        navigate('/assembly_order')}}>ORDRES DE MUNTATGE</h3>
+    </div>
     </div>
     );
 };

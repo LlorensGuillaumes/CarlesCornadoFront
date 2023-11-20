@@ -89,7 +89,7 @@ return (
         <p className="purchase_provider">{item.provider.name || ""}</p>
         <p className="purchase_total">{item.total}€</p>
         <div
-            className="optionBtn link"
+            className="optionBtnList link"
             onClick={() => {
             setPurchaseOrderSelected(item);
             }}
