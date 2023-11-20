@@ -147,8 +147,8 @@ return (
         </div>
 
         <div className="order_data">
-            <h3>Comanda nº{purchaseOrderSelected.orderNumber}</h3>
-            <h3>Data:{purchaseOrderSelected.date}</h3>
+            <h3>Comanda nº {purchaseOrderSelected.orderNumber}</h3>
+            <h3 className="purchase-data">Data: {purchaseOrderSelected.date}</h3>
         </div>
 
         <div className="order_list header-list">

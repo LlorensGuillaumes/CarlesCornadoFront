@@ -46,7 +46,10 @@ width: 10%;
 }
 .order_data{
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
+}
+.purchase-data{
+    margin-left: 20rem;
 }
 
 .purchase_header{
