@@ -16,3 +16,6 @@
     align-items: center;
 
 }
+.selected {
+    background-color: rgb(216, 216, 144);
+}
