@@ -18,5 +18,84 @@ width: 30%;
 width: 10%;
 }
 .order_detail{
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    padding-left: 5rem;
+    width: 70%;
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    background-color: beige;
+    border-radius: 2rem;
+}
+.order_list{
+    display: flex;
+}
+.order_data{
+    display: flex;
+    justify-content: space-around;
+}
+
+.purchase_header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5rem;
+}
+.purchase-order_company{
+    display: flex;
+    flex-direction: column;
+}
+.purchase-order_provider{
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    border: solid 1px black;
+    padding: 0.5rem;
+}
+.purhcase-order_header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+}
+.purchase-order_logo{
+    display: flex;
+    width: 40%;
+}
+.purchase-order_text{
+    display: flex;
+    flex-direction: column;
+    align-items: self-end;
+    width: 60%;
+}
+.purchase-order_city{
+    display: flex;
+}
+.purchase-order_code{
+    width: 22%;
+}
+.purchase-order_name{
+    width: 30%;
+}
+.purchase-order_units{
+    width: 15%;
+}
+.purchase-order_price{
+    width: 15%;
+    text-align: end;
+}
+.header-list{
+    background-color: rgb(190, 188, 188);
+}
+.order_list{
+    width: 70%;
+}
+.purchase-order_total{
+    margin-left: 56%;
+}
+.purchase-order_nota{
+    width: 90%;
+    font-weight: bold;
 }
