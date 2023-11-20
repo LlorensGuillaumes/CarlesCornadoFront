@@ -43,6 +43,8 @@ width: 10%;
 }
 .order_list{
     display: flex;
+    width: 100%;
+    
 }
 .order_data{
     display: flex;
@@ -106,7 +108,7 @@ width: 10%;
     width: 90%;
 }
 .purchase-order_total{
-    margin-left: 56%;
+    margin-left: 76%;
 }
 .purchase-order_nota{
     width: 90%;

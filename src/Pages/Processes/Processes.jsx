@@ -72,8 +72,14 @@ setOptionsVisible({ visible: false, id: "" });
 
 return (
 <div className="procesess">
-<div className="optionBtn">
-<img src={agregar} alt="agregar" title="Nou Procés" />
+<div className="optionBtn link" onClick={() => {
+    setIsNew(true);
+}}>
+<img 
+src={agregar} 
+alt="agregar" 
+title="Nou Procés"  
+ />
 </div>
     <div className="processes-list">
     {processesData &&
@@ -125,14 +131,7 @@ return (
         </div>
         ))}
     </div>
-    <h2
-    className="link"
-    onClick={() => {
-        setIsNew(true);
-    }}
-    >
 
-    </h2>
     {isEdit && (
     <div>
         <input

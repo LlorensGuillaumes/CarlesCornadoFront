@@ -215,7 +215,16 @@ switch (item) {
 return (
 <div className="component">
 <div className="optionBtn">
-<img src={agregar} alt="agregar" title="Nou component"/>
+<img  className="link" src={agregar} alt="agregar" title="Nou component" onClick={() => {
+        setIsNew(true);
+        setIsEdit(false);
+        setComponentDetailVisible(true);
+        getEditData();
+        setProviderList([]);
+        setEquivalencesList([]);
+        setProcessesList([]);
+        }
+}/>
 </div>
     <div className="component-container">
     {componentsData &&
@@ -234,20 +243,7 @@ return (
             <p>{component.description}</p>
         </div>
         ))}
-    <h2
-        className="link"
-        onClick={() => {
-        setIsNew(true);
-        setIsEdit(false);
-        setComponentDetailVisible(true);
-        getEditData();
-        setProviderList([]);
-        setEquivalencesList([]);
-        setProcessesList([]);
-        }}
-    >
-   
-    </h2>
+
     {componentDetailVisible && (
         <div className="">
         {isEdit || isNew ? (
