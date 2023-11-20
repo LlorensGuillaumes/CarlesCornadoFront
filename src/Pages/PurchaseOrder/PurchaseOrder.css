@@ -87,7 +87,7 @@ width: 10%;
     width: 22%;
 }
 .purchase-order_name{
-    width: 30%;
+    width: 60%;
 }
 .purchase-order_units{
     width: 15%;
@@ -100,7 +100,7 @@ width: 10%;
     background-color: rgb(190, 188, 188);
 }
 .order_list{
-    width: 70%;
+    width: 90%;
 }
 .purchase-order_total{
     margin-left: 56%;

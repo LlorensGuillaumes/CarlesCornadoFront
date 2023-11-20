@@ -130,7 +130,7 @@ return (
     </div>
         <div className="purchase_header">
             <div className="purchase-order_company">
-            <p>Safident</p>
+            <p>Swiss-DS-Safident, SLU.</p>
             <p>Carrer Ponent, 10</p>
             <p>43700 El Vendrell</p>
             <p>Tarragona - Spain</p>
