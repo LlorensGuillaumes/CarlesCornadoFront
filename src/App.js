@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./Pages/Home/Home";
@@ -13,23 +13,27 @@ import PurchaseOrder from "./Pages/PurchaseOrder/PurchaseOrder";
 function App() {
   return (
     <Router>
-    <Header/>
+      <Header />
 
       <div className="App">
-      
-        <Routes>
-        
-          <Route path="/providers" element={<Providers />} />
-          <Route path="/components" element={<Components/>}/>
-          <Route path="/processes" element={<Processes/>}/>
-          <Route path="/products" element={<Products/>}/>
-          <Route path="/supplies" element={<Suplies/>}/>
-          <Route path="/purchase_order" element={<PurchaseOrder/>}/>
-          <Route path="/" element={<Home />} />
-        </Routes>
+        <div className="left-column">
+          <Home />
+        </div>
+
+        <div className="right-column">
+          <Routes>
+            <Route path="/providers" element={<Providers />} />
+            <Route path="/components" element={<Components />} />
+            <Route path="/processes" element={<Processes />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/supplies" element={<Suplies />} />
+            <Route path="/purchase_order" element={<PurchaseOrder />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );
 }
 
 export default App;
+

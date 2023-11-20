@@ -16,8 +16,6 @@ get: async(endpoint) => {
 },
 
 post: async (endpoint, body) => {
-    console.log(body)
-    console.log(endpoint)
     try {
     const response = await fetch(BASE_URL + endpoint, {
     method: "POST",

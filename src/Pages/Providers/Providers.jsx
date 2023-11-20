@@ -69,7 +69,6 @@ const Providers = () => {
     api
       .get(`/provisioning/provider/${providerSelected._id}`)
       .then((response) => {
-        console.log(response);
         setSuppliesProviderData(
           TreatyArray.alphabetical(response, "description")
         );
@@ -94,7 +93,6 @@ const Providers = () => {
       shipmentFree: shipmentFree,
       observation: observation,
     };
-    console.log(newProvider);
 
     if (drop) {
       alert('drop')
@@ -127,7 +125,6 @@ const Providers = () => {
         : setAddVisible({ key: null, units: value, id: item });
     }
   };
-  console.log(addVisible)
   const fnAddSuply = () => {
     const newItem = {
       id: addVisible.id._id,
@@ -176,12 +173,9 @@ const Providers = () => {
       idProvider: providerSelected._id,
       provisioning: provisioningItems,
     }
-    console.log(newOrder)
-
     api.post('/purchases/create', newOrder)
-      .then((response)=>console.log(response))
+      .then((response)=>(response))
   }
-console.log(purchaseOrderItems)
   return (
     <div className="provider">
       <h1>PROVEÏDORS</h1>

@@ -7,6 +7,7 @@ import api from "../../Shared/API/api";
 import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 import detalle from "../../Images/icons/detalle.png";
 import logo from "../../Images/logo.jpg"
+import cancelar from "../../Images/icons/cancelar.png";
 const PurchaseOrder = () => {
 const [purchaseOrderData, setPurchaseOrderData] = useState([]);
 const [purchaseOrderSelected, setPurchaseOrderSelected] = useState({});
@@ -48,7 +49,6 @@ setPurchaseList(updatedPurchaseList);
 
 const getPurchaseOrders = () => {
 api.get("/purchases").then((response) => {
-    console.log(response);
     const sortedData = TreatyArray.alphabetical(response, "orderNumber");
     const reverseData = sortedData.reverse();
     setPurchaseOrderData(reverseData);
@@ -70,9 +70,6 @@ try {
 }
 };
 
-
-  
-console.log(purchaseOrderSelected);
 return (
 <div>
     <h1>ORDRES DE COMPRA</h1>
@@ -105,6 +102,15 @@ return (
     <div className="order_detail">
     <div>
     <button onClick={()=>{generatePDF()}}>PDF</button>
+    <div className="optionBtn link">
+    <img 
+    src={cancelar} 
+    alt="Tancar"
+    title="Tancar" 
+    onClick={()=>{
+        setPurchaseOrderSelected({})
+    }}/>
+    </div>
     </div>
     <div id="mypdf">
         <div className="purhcase-order_header">

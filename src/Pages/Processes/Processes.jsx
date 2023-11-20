@@ -44,7 +44,6 @@ getProcesses();
 
 const saveProcess = (isDelete = false) => {
 if (isDelete) {
-    console.log(processSelected);
     const processToDelete = processSelected._id;
     api.delete(`/processes/delete/${processToDelete}`).then((response) => {
     getProcesses();

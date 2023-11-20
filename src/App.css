@@ -12,3 +12,19 @@ img{
 p{
   margin: 0px;
 }
+.detail{
+  width: 50%;
+}
+.App{
+  display: flex;
+
+}
+.left-column{
+  width: 20%;
+}
+.right-column {
+  flex-grow: 1;
+  padding: 20px;
+  width: 80%;
+
+}
