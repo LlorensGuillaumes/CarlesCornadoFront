@@ -8,6 +8,7 @@ import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 import detalle from "../../Images/icons/detalle.png";
 import logo from "../../Images/logo.jpg"
 import cancelar from "../../Images/icons/cancelar.png";
+import pdf from "../../Images/icons/pdf.png";
 const PurchaseOrder = () => {
 const [purchaseOrderData, setPurchaseOrderData] = useState([]);
 const [purchaseOrderSelected, setPurchaseOrderSelected] = useState({});
@@ -101,7 +102,9 @@ return (
     {purchaseOrderSelected && purchaseOrderSelected.provider && (
     <div className="order_detail">
     <div>
-    <button onClick={()=>{generatePDF()}}>PDF</button>
+    <div className="optionBtn link" onClick={()=>{generatePDF()}}>
+    <img src={pdf} alt="Decarregar" title="Descarregar"/>
+    </div>
     <div className="optionBtn link">
     <img 
     src={cancelar} 

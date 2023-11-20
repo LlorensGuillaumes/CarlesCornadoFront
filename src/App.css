@@ -21,10 +21,12 @@ p{
 }
 .left-column{
   width: 20%;
+  margin-top: 8%;
 }
 .right-column {
   flex-grow: 1;
   padding: 20px;
   width: 80%;
+  margin-top: 8%;
 
 }
