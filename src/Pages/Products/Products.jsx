@@ -260,7 +260,21 @@ const Products = () => {
     
     return (
     <div className="component">
-        <h1>PRODUCTES</h1>
+    <div className="optionBtn">
+    <img src={agregar} 
+    className="link" 
+    alt="agregar" 
+    title="Nou producte" 
+    onClick={()=>{
+        setIsNew(true);
+            setIsEdit(false);
+            setComponentDetailVisible(true);
+            getEditData();
+            setProviderList([]);
+            setEquivalencesList([]);
+            setProcessesList([]);
+    }}/>
+    </div>
         <div className="component-container">
         {productsData &&
             productsData.length > 0 &&
@@ -278,22 +292,7 @@ const Products = () => {
                 <p>{component.description}</p>
             </div>
             ))}
-        <h2
-            className="link"
-            onClick={() => {
-            setIsNew(true);
-            setIsEdit(false);
-            setComponentDetailVisible(true);
-            getEditData();
-            setProviderList([]);
-            setEquivalencesList([]);
-            setProcessesList([]);
-            }}
-        >
-        <div className="optionBtn">
-        <img src={agregar} alt="agregar" title="Nou component"/>
-        </div>
-        </h2>
+
         {componentDetailVisible && (
             <div className="">
             {isEdit || isNew ? (

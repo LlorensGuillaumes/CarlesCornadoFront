@@ -72,8 +72,8 @@ try {
 };
 
 return (
-<div>
-    <h1>ORDRES DE COMPRA</h1>
+<div className="purchases">
+    
     <div className="purchases_list">
     <p className="purchase_number">codi</p>
     <p className="purchase_date">data</p>
@@ -140,8 +140,7 @@ return (
             <p>{purchaseOrderSelected.provider.name}</p>
             <p>{purchaseOrderSelected.provider.address}</p>
             <div className="purchase-order_city">
-            <p>{purchaseOrderSelected.provider.cityCode}</p>
-            <p>{purchaseOrderSelected.provider.city}</p>
+            <p>{purchaseOrderSelected.provider.cityCode} {purchaseOrderSelected.provider.city}</p>
             </div>
             <p>{purchaseOrderSelected.provider.country}</p>
             </div>

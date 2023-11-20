@@ -1,18 +1,28 @@
+.purchases{
+    display: flex;
+    flex-direction: column;
+    padding-top: 2rem;
+}
 .purchases_list{
     display: flex;
+    width: 70%;
+    background-color: rgb(204, 202, 202);
+    padding: 0.3rem;
 
 }
 .purchases_list-item{
     display: flex;
+    width: 70%;
+    padding: 0.3rem;
 }
 .purchase_number{
-width: 15%;
+width: 20%;
 }
 .purchase_date{
-width: 10%;
+width: 15%;
 }
 .purchase_provider{
-width: 30%;
+width: 40%;
 }
 .purchase_total{
 width: 10%;

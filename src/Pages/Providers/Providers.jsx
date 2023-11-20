@@ -178,7 +178,7 @@ const Providers = () => {
   }
   return (
     <div className="provider">
-      <h1>PROVEÏDORS</h1>
+      
       <div
         className="optionBtn link"
         onClick={() => {

@@ -1,6 +1,7 @@
 .procesess{
     display: flex;
     flex-direction: column;
+    padding-top: 2rem;
 
 }
 .processes-list{

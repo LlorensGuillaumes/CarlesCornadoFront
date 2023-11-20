@@ -214,7 +214,9 @@ switch (item) {
 
 return (
 <div className="component">
-    <h1>COMPONENTS</h1>
+<div className="optionBtn">
+<img src={agregar} alt="agregar" title="Nou component"/>
+</div>
     <div className="component-container">
     {componentsData &&
         componentsData.length > 0 &&
@@ -244,9 +246,7 @@ return (
         setProcessesList([]);
         }}
     >
-    <div className="optionBtn">
-    <img src={agregar} alt="agregar" title="Nou component"/>
-    </div>
+   
     </h2>
     {componentDetailVisible && (
         <div className="">

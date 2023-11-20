@@ -1,6 +1,7 @@
 .provider{
     display: flex;
     flex-direction: column;
+    padding-top: 2rem;
 }
 .provider-container{
 display: flex;

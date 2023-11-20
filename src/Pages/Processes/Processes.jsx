@@ -72,7 +72,9 @@ setOptionsVisible({ visible: false, id: "" });
 
 return (
 <div className="procesess">
-    <h1>PROCESSOS</h1>
+<div className="optionBtn">
+<img src={agregar} alt="agregar" title="Nou Procés" />
+</div>
     <div className="processes-list">
     {processesData &&
         processesData.length > 0 &&
@@ -129,9 +131,7 @@ return (
         setIsNew(true);
     }}
     >
-    <div className="optionBtn">
-        <img src={agregar} alt="agregar" title="Nou Procés" />
-    </div>
+
     </h2>
     {isEdit && (
     <div>

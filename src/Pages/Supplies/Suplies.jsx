@@ -93,7 +93,9 @@ const Suplies = () => {
 
     return (
     <div className="procesess">
-        <h1>APROVISIONAMENT</h1>
+    <div className="optionBtn">
+    <img src={agregar} alt="agregar" title="Nou Aprovisonament" className="link" />
+</div>
         <div className="processes-list">
         {suppliesData &&
             suppliesData.length > 0 &&
@@ -155,9 +157,7 @@ const Suplies = () => {
             setIsNew(true)
         }}
         >
-        <div className="optionBtn">
-            <img src={agregar} alt="agregar" title="Nou Procés" />
-        </div>
+
         </h2>
         {isEdit && (
         <div className="new_supply">
