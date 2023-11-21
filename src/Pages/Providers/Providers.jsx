@@ -20,6 +20,7 @@ const Providers = () => {
     units: 0,
     id: null,
   });
+  const [purchaseSendObservations, setPurchaseSendObservations] = useState([]);
   const [providerSelected, setProviderSelected] = useState();
   const [purchaseOrderItems, setPurchaseOrderItems] = useState([]);
   const [purchaseOrderTotal, setPurchaseOrderTotal] = useState();
@@ -34,8 +35,12 @@ const Providers = () => {
   const [city, setCity] = useState();
   const [country, setCountry] = useState();
   const [observation, setObservation] = useState();
+  const [sendObservations, setSendObservations] = useState('');
+  const [sendObservationsList, setSendObservationsList] = useState([]);
   const [TaxIdentificationNumber, setTaxIdentificationNumber] = useState();
   const [shipmentFree, setShipmentFree] = useState(false);
+  const [currency, setCurrency] = useState('€');
+  const [language, setLanguage] = useState('Català');
 
   useEffect(() => {
     getProviders();
@@ -65,6 +70,14 @@ const Providers = () => {
       });
   };
 
+  useEffect(()=>{
+    if(providerSelected){
+      setSendObservationsList(providerSelected.sendObservations)
+    }
+    
+
+  },[providerSelected])
+
   const getSuppliesProviders = () => {
     api
       .get(`/provisioning/provider/${providerSelected._id}`)
@@ -92,6 +105,9 @@ const Providers = () => {
       email: email,
       shipmentFree: shipmentFree,
       observation: observation,
+      sendObservations: sendObservationsList,
+      language: language,
+      currency: currency,
     };
 
     if (drop) {
@@ -111,7 +127,7 @@ const Providers = () => {
     }
 
     if (isEdit) {
-      api.put(`/providers/edit/${providerSelected._id}`).then((responsse) => {
+      api.put(`/providers/edit/${providerSelected._id}`, newProvider).then((responsse) => {
         getProviders();
         btnClose();
       });
@@ -172,10 +188,22 @@ const Providers = () => {
       orderNumber: ordenNumber,
       idProvider: providerSelected._id,
       provisioning: provisioningItems,
+      sendObservations: purchaseSendObservations,
     }
     api.post('/purchases/create', newOrder)
       .then((response)=>(response))
   }
+
+  const fnAddSendObservation = (sendObservation, isChecked) => {
+    if(isChecked){
+      setPurchaseSendObservations((prev)=>[...prev, sendObservation])
+    }else {
+      const sendObservationsWithoutSendObservation = purchaseSendObservations.filter((item)=>(item !== sendObservation));
+      setPurchaseSendObservations(sendObservationsWithoutSendObservation);
+    }
+    
+  }
+
   return (
     <div className="provider">
       
@@ -280,14 +308,6 @@ const Providers = () => {
                 }}
                 className="text_input"
               />
-              <input
-                defaultValue={!isNew ? providerSelected.observation : ""}
-                placeholder="Observacions"
-                onChange={(e) => {
-                  setObservation(e.target.value);
-                }}
-                className="text_input"
-              />
               <label>
                 enviament Gratuït:
                 <input
@@ -304,6 +324,55 @@ const Providers = () => {
                   }}
                 />
               </label>
+              <select onChange={(e)=>{setLanguage(e.target.value)}}>
+              <option>Selecciona idioma</option>
+              <option>Català</option>
+              <option>Anglès</option>
+              </select>
+              <select onChange={(e)=>setCurrency(e.target.value)}>
+              <option>Selecciona moneda</option>
+              <option>€</option>
+              <option>$</option>
+              <option>CHF</option>
+              </select>
+              <input
+                defaultValue={!isNew ? providerSelected.observation : ""}
+                placeholder="Observacions"
+                onChange={(e) => {
+                  setObservation(e.target.value);
+                }}
+                className="text_input"
+              />
+              <input
+                defaultValue={!isNew ? providerSelected.observation : ""}
+                placeholder="Observacions d'enviament"
+                onChange={(e) => {
+                  setSendObservations(e.target.value);
+                }}
+                className="text_input"
+              />
+              <div 
+              className="optionBtn link"
+              onClick={()=>{
+                setSendObservationsList((prev)=>[...prev, sendObservations])
+              }}
+              >
+              <img 
+              src={agregar} 
+              alt="Agregar" 
+              title="Afegir observació"/>
+              </div>
+              {sendObservationsList && sendObservationsList.length > 0 && sendObservationsList.map((sendObservation, index)=>(
+                <div key={index}>
+                <p>{sendObservation}</p>
+                <div className="optionBtnList link" onClick={()=>{
+                  setSendObservationsList(sendObservationsList.filter((item)=>(item !== sendObservation)))
+                }}>
+                <img src={papelera} alt="Eliminar" title="Eliminar"/>
+                </div>
+                </div>
+              ))}
+              
               <button
                 className="link provider_detail_button"
                 onClick={() => {
@@ -352,6 +421,14 @@ const Providers = () => {
                   readOnly
                 />
               </label>
+              <p>Idioma: {providerSelected.language}</p>
+              <p>Moneda: {providerSelected.currency}</p>
+              <p>Observacions d'enviamet:</p>
+              {sendObservationsList && sendObservationsList.length > 0 && sendObservationsList.map((item, index)=>(
+                <div key={index}>
+                <p>{item}</p>
+                </div>
+              ))}
 
               <div className="optionBtn">
                 <img
@@ -394,6 +471,14 @@ const Providers = () => {
         <div className="purchase_order-container">
           <h1>CREAR ORDRE DE COMPRA</h1>
           <p>{providerSelected.name}</p>
+          {providerSelected.sendObservations && providerSelected.sendObservations.length > 0 && providerSelected.sendObservations.map((item, index)=>(
+            <div key={index}>
+            <input type="checkbox" onChange={(e)=>{
+              fnAddSendObservation(item, e.target.checked)
+            }}/>
+            <p>{item}</p>
+            </div>
+          ))}
           {suppliesProviderData &&
             suppliesProviderData.length > 0 &&
             suppliesProviderData.map((item, index) => (

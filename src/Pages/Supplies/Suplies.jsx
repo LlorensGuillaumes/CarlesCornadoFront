@@ -93,7 +93,10 @@ const Suplies = () => {
 
     return (
     <div className="procesess">
-    <div className="optionBtn">
+    <div className="optionBtn" onClick={() => {
+        getProviders()
+        setIsNew(true)
+    }}>
     <img src={agregar} alt="agregar" title="Nou Aprovisonament" className="link" />
 </div>
         <div className="processes-list">
@@ -150,15 +153,6 @@ const Suplies = () => {
             </div>
             ))}
         </div>
-        <h2
-        className="link"
-        onClick={() => {
-            getProviders()
-            setIsNew(true)
-        }}
-        >
-
-        </h2>
         {isEdit && (
         <div className="new_supply">
         <h1>MODIFICAR</h1>

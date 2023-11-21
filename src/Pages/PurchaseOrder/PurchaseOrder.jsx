@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./PurchaseOrder.css";
 import html2pdf from "html2pdf.js";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import api from "../../Shared/API/api";
 import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 import detalle from "../../Images/icons/detalle.png";
@@ -42,6 +40,9 @@ const updatedPurchaseList = purchaseOrderData.map((order) => {
     provider: order.idProvider,
     total: total,
     provisioning: order.provisioning,
+    sendObservations: order.sendObservations,
+    language: order.idProvider.language,
+    currency: order.idProvider.currency,
     };
 });
 
@@ -50,8 +51,10 @@ setPurchaseList(updatedPurchaseList);
 
 const getPurchaseOrders = () => {
 api.get("/purchases").then((response) => {
+    console.log(response)
     const sortedData = TreatyArray.alphabetical(response, "orderNumber");
     const reverseData = sortedData.reverse();
+    console.log(reverseData)
     setPurchaseOrderData(reverseData);
 });
 };
@@ -59,7 +62,7 @@ api.get("/purchases").then((response) => {
 const generatePDF = async () => {
 try {
     const content = document.getElementById("mypdf");
-    const pdfDataUri = await html2pdf(content, {
+    await html2pdf(content, {
     margin: 10,
     filename: purchaseOrderSelected.orderNumber,
     image: { type: "jpeg", quality: 0.98 },
@@ -70,7 +73,7 @@ try {
     console.error("Error al generar el PDF:", error);
 }
 };
-
+console.log(purchaseOrderSelected)
 return (
 <div className="purchases">
     
@@ -87,7 +90,7 @@ return (
         <p className="purchase_number">{item.orderNumber}</p>
         <p className="purchase_date">{item.date}</p>
         <p className="purchase_provider">{item.provider.name || ""}</p>
-        <p className="purchase_total">{item.total}€</p>
+        <p className="purchase_total">{item.total}{item.currency}</p>
         <div
             className="optionBtnList link"
             onClick={() => {
@@ -147,8 +150,8 @@ return (
         </div>
 
         <div className="order_data">
-            <h3>Comanda nº {purchaseOrderSelected.orderNumber}</h3>
-            <h3 className="purchase-data">Data: {purchaseOrderSelected.date}</h3>
+            <h3>{purchaseOrderSelected.provider.language === "Català" ? `Comanda nº ${purchaseOrderSelected.orderNumber}` : `Order num: ${purchaseOrderSelected.orderNumber}`}</h3>
+            <h3 className="purchase-data">{purchaseOrderSelected.provider.language === "Català" ? `Data: ${purchaseOrderSelected.date}` : `Date: ${purchaseOrderSelected.date}`}</h3>
         </div>
 
         <div className="order_list header-list">
@@ -166,12 +169,18 @@ return (
                 <p className="purchase-order_units">{item.units}x</p>
                 <p className="purchase-order_code">{item.idSuply.code}</p>
                 <p className="purchase-order_name">{item.idSuply.description}</p>
-                <p className="purchase-order_price">{item.price}€</p>
-                <p className="purchase-order_price">{item.units * item.price}€</p>
+                <p className="purchase-order_price">{item.price}{purchaseOrderSelected.provider.currency}</p>
+                <p className="purchase-order_price">{item.units * item.price}{purchaseOrderSelected.provider.currency}</p>
             </div>
             ))}
-            <h3 className="purchase-order_total">TOTAL: {purchaseOrderSelected.total}€</h3>
-            <p className="purchase-order_nota">NOTA: La seva homologació com a proveïdor serà avaluada de forma continua considerant la satisfacció del clent final.</p>
+            <h3 className="purchase-order_total">TOTAL: {purchaseOrderSelected.total}{purchaseOrderSelected.provider.currency}</h3>
+            <h3>{purchaseOrderSelected.sendObservations}</h3>
+            <p className="purchase-order_nota">
+            {purchaseOrderSelected.provider.language === "Català" ? 
+            'NOTA: La seva homologació com a proveïdor serà avaluada de forma continua considerant la satisfacció del clent final.' 
+            : 
+            'NOTE: Your approval as a supplier will be evaluated continuously considering the satisfaction of the final customer.'}
+            </p>
         </div>
     
     
