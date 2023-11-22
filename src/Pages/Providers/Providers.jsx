@@ -14,8 +14,11 @@ import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
 const Providers = () => {
   const [providersData, setProvidersData] = useState([]);
   const [suppliesProviderData, setSuppliesProviderData] = useState([]);
+  const [componentsProvidersData, setComponentsProvidersData] = useState([]);
+  const [productsProvidersData, setProductsProvidersData] = useState([]);
   const [providerDetailVisible, setProviderDetailVisible] = useState(false);
   const [purchaseOrderVisible, setPurchaseOrderVisible] = useState(false);
+  const [groupSelected, setGroupSelected] = useState("1");
   const [showConfirm, setShowConfirm] = useState(false);
   const [addVisible, setAddVisible] = useState({
     key: null,
@@ -84,10 +87,28 @@ const Providers = () => {
         );
       });
   };
+
+  const getComponentsProviders = () =>{
+    api
+      .get(`/provisioning/provider/${providerSelected._id}`)
+      .then((response) => {
+        setSuppliesProviderData(
+          TreatyArray.alphabetical(response, "description")
+        );
+      });
+  }
+
+  const getProductsProviders = () => {
+
+  }
   const btnClose = () => {
     setProviderDetailVisible(false);
     setIsEdit(false);
     setIsNew(false);
+  };
+
+  const fnChangeGroupSelected = (option) => {
+    setGroupSelected(option);
   };
 
   const saveProvider = (drop = false) => {
@@ -130,9 +151,7 @@ const Providers = () => {
 
   const dropProvider = (confirm) => {
     if (confirm) {
-      api
-      .put(`/providers/delete/${providerSelected._id}`)
-      .then((response) => {
+      api.put(`/providers/delete/${providerSelected._id}`).then((response) => {
         getProviders();
         btnClose();
       });
@@ -423,7 +442,7 @@ const Providers = () => {
                   <h3>Configuració</h3>
                   <div className="shipmentFree_item">
                     <p>Enviament Gratuït: </p>
-                    <p>{providerSelected.shipmentFree ? 'Si' : 'No'}</p>
+                    <p>{providerSelected.shipmentFree ? "Si" : "No"}</p>
                   </div>
                   <p>Idioma: {providerSelected.language}</p>
                   <p>Moneda: {providerSelected.currency}</p>
@@ -472,6 +491,8 @@ const Providers = () => {
                     onClick={() => {
                       setPurchaseOrderVisible(true);
                       getSuppliesProviders();
+                      getComponentsProviders();
+                      getProductsProviders();
                     }}
                   />
                 </div>
@@ -489,10 +510,11 @@ const Providers = () => {
               </div>
               {showConfirm && (
                 <DeleteConfirm
-                  text = {providerSelected.name} 
-                  onAceptar = {() => dropProvider(true)}
-                  onCancelar = {() => dropProvider(false)}
-              />)}
+                  text={providerSelected.name}
+                  onAceptar={() => dropProvider(true)}
+                  onCancelar={() => dropProvider(false)}
+                />
+              )}
             </div>
           )}
         </div>
@@ -501,46 +523,82 @@ const Providers = () => {
         <div className="purchase_order-container">
           <h1>CREAR ORDRE DE COMPRA</h1>
           <div className="buttons-box">
-          <div className="optionBtn link">
-            <img
-              src={cancelar}
-              alt="Cancelar"
-              title="Cancelar"
-              onClick={() => {
-                setPurchaseOrderVisible(false);
-              }}
-            />
-          </div>
-          <div className="optionBtn">
-          <img
-            className="link"
-            src={guardar}
-            alt="Guardar"
-            title="Guardar"
-            onClick={() => {
-              fnSaveOrder();
-              setPurchaseOrderVisible(false)
-            }}
-          />
-        </div>
+            <div className="optionBtn link">
+              <img
+                src={cancelar}
+                alt="Cancelar"
+                title="Cancelar"
+                onClick={() => {
+                  setPurchaseOrderVisible(false);
+                }}
+              />
+            </div>
+            <div className="optionBtn">
+              <img
+                className="link"
+                src={guardar}
+                alt="Guardar"
+                title="Guardar"
+                onClick={() => {
+                  fnSaveOrder();
+                  setPurchaseOrderVisible(false);
+                }}
+              />
+            </div>
           </div>
           <h3>{providerSelected.name}</h3>
-          <div className="sendOptions-box" >
-          <p>Observacions d'enviament</p>
-          {providerSelected.sendObservations &&
-            providerSelected.sendObservations.length > 0 &&
-            providerSelected.sendObservations.map((item, index) => (
-              <div key={index} >
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    fnAddSendObservation(item, e.target.checked);
-                  }}
-                />
-                <p>{item}</p>
-              </div>
-            ))}
-          
+          <div className="sendOptions-box">
+            <p>Observacions d'enviament</p>
+            {providerSelected.sendObservations &&
+              providerSelected.sendObservations.length > 0 &&
+              providerSelected.sendObservations.map((item, index) => (
+                <div key={index}>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      fnAddSendObservation(item, e.target.checked);
+                    }}
+                  />
+                  <p>{item}</p>
+                </div>
+              ))}
+          </div>
+          <div>
+            <label>
+              <input
+                type="radio"
+                value="1"
+                checked={groupSelected === "1"}
+                onChange={() => {
+                  fnChangeGroupSelected("1");
+                }}
+              />
+              Aprovisionaments
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                value="2"
+                checked={groupSelected === "2"}
+                onChange={() => {
+                  fnChangeGroupSelected("2");
+                }}
+              />
+              Components
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                value="3"
+                checked={groupSelected === "3"}
+                onChange={() => {
+                  fnChangeGroupSelected("3");
+                }}
+              />
+              Productes
+            </label>
           </div>
 
           {suppliesProviderData &&
@@ -551,7 +609,9 @@ const Providers = () => {
                 <p className="purchase_supply-description">
                   {item.description}
                 </p>
-                <p className="purchase_supply-price">{item.price} {providerSelected.currency}</p>
+                <p className="purchase_supply-price">
+                  {item.price} {providerSelected.currency}
+                </p>
                 <input
                   className="purchase_supply-units"
                   type="number"
@@ -574,29 +634,32 @@ const Providers = () => {
                 )}
               </div>
             ))}
-          
+
           <div>
             <h2>ORDRE DE COMPRA</h2>
 
             {purchaseOrderTotal && purchaseOrderTotal > 0 && (
-              <h3>Import ordre de compra: {purchaseOrderTotal} {providerSelected.currency}</h3>
+              <h3>
+                Import ordre de compra: {purchaseOrderTotal}{" "}
+                {providerSelected.currency}
+              </h3>
             )}
             <div className="purchase_order-item header-list">
-                  <p className="purchase_supply-code">codi</p>
-                  <p className="purchase_supply-description">nom</p>
-                  <p className="purchase_supply-price">preu/u.</p>
-                  <p className="purchase_supply-units-detail"> unitats</p>
-                  <p className="purchase_supply-price">
-                    subTotal
-                  </p>
-                </div>
+              <p className="purchase_supply-code">codi</p>
+              <p className="purchase_supply-description">nom</p>
+              <p className="purchase_supply-price">preu/u.</p>
+              <p className="purchase_supply-units-detail"> unitats</p>
+              <p className="purchase_supply-price">subTotal</p>
+            </div>
             {purchaseOrderItems &&
               purchaseOrderItems.length > 0 &&
               purchaseOrderItems.map((item, index) => (
                 <div key={index} className="purchase_order-item">
                   <p className="purchase_supply-code">{item.code}</p>
                   <p className="purchase_supply-description">{item.name}</p>
-                  <p className="purchase_supply-price">{item.price} {providerSelected.currency}/u.</p>
+                  <p className="purchase_supply-price">
+                    {item.price} {providerSelected.currency}/u.
+                  </p>
                   <p className="purchase_supply-units-detail">{item.units} u</p>
                   <p className="purchase_supply-price">
                     {item.units * item.price} {providerSelected.currency}

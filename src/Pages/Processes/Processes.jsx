@@ -11,10 +11,12 @@ import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
 
 const Processes = () => {
 const [processesData, setProcessesData] = useState([]);
+const [providersData, setProvidersData] = useState([]);
 const [isNew, setIsNew] = useState(false);
 const [isEdit, setIsEdit] = useState(false);
 const [processSelected, setProcessSelected] = useState(null);
-const [newProcess, setNewProcess] = useState("");
+const [newProcessName, setNewProcessName] = useState("");
+const [newProcessProvider, setNewProcessProvider] = useState("");
 const [optionsVisible, setOptionsVisible] = useState({
 visible: false,
 id: "",
@@ -39,9 +41,21 @@ api
     console.log(error);
     });
 };
+const getProviders = () => {
+    api.get('/providers')
+    .then((response)=>{
+        setProvidersData(response)
+    })
+    .catch((error) => {
+    console.log(error)
+
+    });
+    
+}
 
 useState(() => {
 getProcesses();
+getProviders();
 }, []);
 
 const saveProcess = (isDelete = false) => {
@@ -50,9 +64,11 @@ if (isDelete) {
     
 } else {
     const newProcessToSave = {
-    name: newProcess,
+    name: newProcessName,
+    provider: newProcessProvider,
     };
 
+    console.log(newProcessToSave)
     {
     isNew
         ? api.post("/processes/create", newProcessToSave).then((response) => {
@@ -90,7 +106,7 @@ return (
 src={agregar} 
 alt="agregar" 
 title="Nou Procés"  
- />
+/>
 </div>
     <div className="processes-list">
     {processesData &&
@@ -105,6 +121,7 @@ title="Nou Procés"
             }}
         >
             <p>{process.name}</p>
+            <p>{process.provider}</p>
 
             <div className="papelera-container">
             {optionsVisible.visible &&
@@ -149,8 +166,17 @@ title="Nou Procés"
         <input
         type="text"
         defaultValue={processSelected.name}
-        onChange={(e) => setNewProcess(e.target.value)}
+        onChange={(e) => setNewProcessName(e.target.value)}
         />
+        <select 
+        className="process_select-provider" 
+        onChange={(e)=>setNewProcessProvider(e.target.value)}
+        value={processSelected.provider}>
+        <option>Safident</option>
+        {providersData && providersData.length > 0 && providersData.map((item, index)=>(
+            <option key={index}>{item.name}</option>
+        ))}
+        </select>
         <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
         <img
@@ -181,8 +207,16 @@ title="Nou Procés"
     <div className="processes_modify">
         <input
         placeholder="Nou procés"
-        onChange={(e) => setNewProcess(e.target.value)}
+        onChange={(e) => setNewProcessName(e.target.value)}
         />
+        <select className="process_select-provider" 
+        onChange={(e)=>setNewProcessProvider(e.target.value)}>
+        <option>Selecciona proveïdor</option>
+        <option>Safident</option>
+        {providersData && providersData.length > 0 && providersData.map((item, index)=>(
+            <option key={index}>{item.name}</option>
+        ))}
+        </select>
         <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
             <img
