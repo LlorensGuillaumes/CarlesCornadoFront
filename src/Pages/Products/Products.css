@@ -1,0 +1,11 @@
+.component-detail-container input{
+    width: 30%;
+}
+.productsItemContainer{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+.headbord-filter input{
+    width: 20%;
+}

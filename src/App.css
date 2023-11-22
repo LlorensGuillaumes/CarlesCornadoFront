@@ -12,6 +12,13 @@ img{
 .optionBtnList{
   width: 1.6rem;
 }
+.buttons-box{
+  display: flex;
+  margin-top: 2rem;
+}
+.buttons-box div{
+  margin: 0.5rem;
+}
 p{
   margin: 0px;
 }
@@ -32,4 +39,9 @@ p{
   width: 80%;
   margin-top: 8%;
 
+}
+input {
+  border-radius: 2rem;
+  padding: 0.5rem;
+  height: 1.2rem;
 }

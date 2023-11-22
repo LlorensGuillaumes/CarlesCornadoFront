@@ -16,6 +16,10 @@ flex-wrap: wrap;
     background-color: beige;
     margin: 2rem;
     border-radius: 2rem;
+    padding: 1.5rem;
+}
+.provider-container_item p {
+    margin: 0.3rem;
 }
 .provider-detail-container{
     display: flex;
@@ -30,6 +34,8 @@ flex-wrap: wrap;
     z-index: 5;
     background-color: beige;
     border-radius: 2rem;
+    margin-top: 5rem;
+    border: 1px solid black;
 }
 .provider_detail_button{
     background-color: transparent;
@@ -48,30 +54,47 @@ flex-wrap: wrap;
     padding: 2rem;
     padding-left: 5rem;
     width: 70%;
-    height: 100%;
     position: absolute;
-    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 5;
-    background-color: white;
+    background-color: beige;
     border-radius: 2rem;
+    border: 1px solid black;
+    margin-top: 12rem;
 }
 .purchase_order-item{
-    background-color: beige;
     display: flex;
     align-items: center;
-    /* padding: 0.5rem; */
+    padding-top: 0.3rem;
+    width: 70%;
+    margin-bottom: 3rem;
+}
+.sendOptions-box{
+    display: flex;
+    flex-direction: column;
+    border: solid 1px black;
+    width: 30%;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    
+}
+.sendOptions-box div{
+    display: flex;
+    margin-top: 0.3rem;
+}
+.sendOptions-box div input {
+    margin-right: 1rem;
 }
 
 .purchase_supply-code{
-    width: 15%;
-}
-.purchase_supply-description{
     width: 20%;
 }
+.purchase_supply-description{
+    width: 35%;
+}
 .purchase_supply-price{
-    width: 10%;
+    width: 15%;
     text-align: end;
     margin-right: 1rem;
 }
@@ -85,8 +108,27 @@ flex-wrap: wrap;
 }
 
 .purchase_supply-units-detail{
-    width: 8%;
+    width: 12%;
     border: none;
     height: 1.2rem;
     text-align: center;
+}
+.provider_detail-container{
+    display: flex;
+    flex-direction: column;
+}
+.provider-detail-container p{
+    margin: 0.3rem;
+}
+.shipmentFree_item{
+    display: flex;
+}
+.provider_options-detail{
+    display: flex;
+    flex-direction: column;
+    border: solid 1px black;
+    width: 30%;
+    margin-top: 1rem;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
 }

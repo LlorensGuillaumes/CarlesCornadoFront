@@ -9,12 +9,14 @@ import order from "../../Images/icons/order.png";
 import guardar from "../../Images/icons/guardar.png";
 import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 import irA from "../../Shared/ScrollTo/scroll";
+import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
 
 const Providers = () => {
   const [providersData, setProvidersData] = useState([]);
   const [suppliesProviderData, setSuppliesProviderData] = useState([]);
   const [providerDetailVisible, setProviderDetailVisible] = useState(false);
   const [purchaseOrderVisible, setPurchaseOrderVisible] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [addVisible, setAddVisible] = useState({
     key: null,
     units: 0,
@@ -23,7 +25,7 @@ const Providers = () => {
   const [purchaseSendObservations, setPurchaseSendObservations] = useState([]);
   const [providerSelected, setProviderSelected] = useState();
   const [purchaseOrderItems, setPurchaseOrderItems] = useState([]);
-  const [purchaseOrderTotal, setPurchaseOrderTotal] = useState();
+  const [purchaseOrderTotal, setPurchaseOrderTotal] = useState(0);
   const [isEdit, setIsEdit] = useState(false);
   const [isNew, setIsNew] = useState(false);
 
@@ -35,29 +37,26 @@ const Providers = () => {
   const [city, setCity] = useState();
   const [country, setCountry] = useState();
   const [observation, setObservation] = useState();
-  const [sendObservations, setSendObservations] = useState('');
+  const [sendObservations, setSendObservations] = useState("");
   const [sendObservationsList, setSendObservationsList] = useState([]);
   const [TaxIdentificationNumber, setTaxIdentificationNumber] = useState();
   const [shipmentFree, setShipmentFree] = useState(false);
-  const [currency, setCurrency] = useState('€');
-  const [language, setLanguage] = useState('Català');
+  const [currency, setCurrency] = useState("€");
+  const [language, setLanguage] = useState("Català");
 
   useEffect(() => {
     getProviders();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     let total = 0;
-    
 
     for (const item of purchaseOrderItems) {
-      const subTotal = item.price * item.units; 
+      const subTotal = item.price * item.units;
       total = total + subTotal;
-      
-    };
-  setPurchaseOrderTotal(total);
-
-  },[purchaseOrderItems])
+    }
+    setPurchaseOrderTotal(parseInt(total));
+  }, [purchaseOrderItems]);
 
   const getProviders = () => {
     api
@@ -70,13 +69,11 @@ const Providers = () => {
       });
   };
 
-  useEffect(()=>{
-    if(providerSelected){
-      setSendObservationsList(providerSelected.sendObservations)
+  useEffect(() => {
+    if (providerSelected) {
+      setSendObservationsList(providerSelected.sendObservations);
     }
-    
-
-  },[providerSelected])
+  }, [providerSelected]);
 
   const getSuppliesProviders = () => {
     api
@@ -111,14 +108,9 @@ const Providers = () => {
     };
 
     if (drop) {
-      alert('drop')
-      api
-        .delete(`/providers/delete/${providerSelected._id}`)
-        .then((response) => {
-          getProviders();
-          btnClose();
-        });
+      setShowConfirm(true);
     }
+
     if (isNew) {
       api.post("/providers/create", newProvider).then((response) => {
         getProviders();
@@ -127,17 +119,30 @@ const Providers = () => {
     }
 
     if (isEdit) {
-      api.put(`/providers/edit/${providerSelected._id}`, newProvider).then((responsse) => {
+      api
+        .put(`/providers/edit/${providerSelected._id}`, newProvider)
+        .then((responsse) => {
+          getProviders();
+          btnClose();
+        });
+    }
+  };
+
+  const dropProvider = (confirm) => {
+    if (confirm) {
+      api
+      .put(`/providers/delete/${providerSelected._id}`)
+      .then((response) => {
         getProviders();
         btnClose();
       });
     }
+    setShowConfirm(false);
   };
-
   const fnChangeUtis = (index, value, item) => {
     {
       value >= 0
-        ? setAddVisible({ key: index, units:value, id:item })
+        ? setAddVisible({ key: index, units: value, id: item })
         : setAddVisible({ key: null, units: value, id: item });
     }
   };
@@ -154,10 +159,9 @@ const Providers = () => {
       (item) => item.id !== newItem.id
     );
     setPurchaseOrderItems([...purchaseItemsNotActual, newItem]);
-
   };
 
-  const fnSaveOrder = () =>{
+  const fnSaveOrder = () => {
     const actualDate = new Date();
     const day = actualDate.getDate();
     const month = actualDate.getMonth() + 1;
@@ -178,35 +182,32 @@ const Providers = () => {
         idSuply: item.id,
         units: parseInt(item.units),
         price: parseInt(item.price),
-      }
-      if(provisioning.units !== 0){
+      };
+      if (provisioning.units !== 0) {
         provisioningItems.push(provisioning);
       }
-      
     }
     const newOrder = {
       orderNumber: ordenNumber,
       idProvider: providerSelected._id,
       provisioning: provisioningItems,
       sendObservations: purchaseSendObservations,
-    }
-    api.post('/purchases/create', newOrder)
-      .then((response)=>(response))
-  }
+    };
+    api.post("/purchases/create", newOrder).then((response) => response);
+  };
 
   const fnAddSendObservation = (sendObservation, isChecked) => {
-    if(isChecked){
-      setPurchaseSendObservations((prev)=>[...prev, sendObservation])
-    }else {
-      const sendObservationsWithoutSendObservation = purchaseSendObservations.filter((item)=>(item !== sendObservation));
+    if (isChecked) {
+      setPurchaseSendObservations((prev) => [...prev, sendObservation]);
+    } else {
+      const sendObservationsWithoutSendObservation =
+        purchaseSendObservations.filter((item) => item !== sendObservation);
       setPurchaseSendObservations(sendObservationsWithoutSendObservation);
     }
-    
-  }
+  };
 
   return (
     <div className="provider">
-      
       <div
         className="optionBtn link"
         onClick={() => {
@@ -324,16 +325,20 @@ const Providers = () => {
                   }}
                 />
               </label>
-              <select onChange={(e)=>{setLanguage(e.target.value)}}>
-              <option>Selecciona idioma</option>
-              <option>Català</option>
-              <option>Anglès</option>
+              <select
+                onChange={(e) => {
+                  setLanguage(e.target.value);
+                }}
+              >
+                <option>Selecciona idioma</option>
+                <option>Català</option>
+                <option>Anglès</option>
               </select>
-              <select onChange={(e)=>setCurrency(e.target.value)}>
-              <option>Selecciona moneda</option>
-              <option>€</option>
-              <option>$</option>
-              <option>CHF</option>
+              <select onChange={(e) => setCurrency(e.target.value)}>
+                <option>Selecciona moneda</option>
+                <option>€</option>
+                <option>$</option>
+                <option>CHF</option>
               </select>
               <input
                 defaultValue={!isNew ? providerSelected.observation : ""}
@@ -351,28 +356,37 @@ const Providers = () => {
                 }}
                 className="text_input"
               />
-              <div 
-              className="optionBtn link"
-              onClick={()=>{
-                setSendObservationsList((prev)=>[...prev, sendObservations])
-              }}
+              <div
+                className="optionBtn link"
+                onClick={() => {
+                  setSendObservationsList((prev) => [
+                    ...prev,
+                    sendObservations,
+                  ]);
+                }}
               >
-              <img 
-              src={agregar} 
-              alt="Agregar" 
-              title="Afegir observació"/>
+                <img src={agregar} alt="Agregar" title="Afegir observació" />
               </div>
-              {sendObservationsList && sendObservationsList.length > 0 && sendObservationsList.map((sendObservation, index)=>(
-                <div key={index}>
-                <p>{sendObservation}</p>
-                <div className="optionBtnList link" onClick={()=>{
-                  setSendObservationsList(sendObservationsList.filter((item)=>(item !== sendObservation)))
-                }}>
-                <img src={papelera} alt="Eliminar" title="Eliminar"/>
-                </div>
-                </div>
-              ))}
-              
+              {sendObservationsList &&
+                sendObservationsList.length > 0 &&
+                sendObservationsList.map((sendObservation, index) => (
+                  <div key={index}>
+                    <p>{sendObservation}</p>
+                    <div
+                      className="optionBtnList link"
+                      onClick={() => {
+                        setSendObservationsList(
+                          sendObservationsList.filter(
+                            (item) => item !== sendObservation
+                          )
+                        );
+                      }}
+                    >
+                      <img src={papelera} alt="Eliminar" title="Eliminar" />
+                    </div>
+                  </div>
+                ))}
+
               <button
                 className="link provider_detail_button"
                 onClick={() => {
@@ -393,76 +407,92 @@ const Providers = () => {
           ) : (
             <div className="provider-detail-container">
               <h1>{providerSelected.name}</h1>
-              <div className="optionBtn">
-                <img
-                  className="link"
-                  src={order}
-                  alt="Ordre de compra"
-                  title="Ordre de compra"
-                  onClick={() => {
-                    setPurchaseOrderVisible(true);
-                    getSuppliesProviders();
-                  }}
-                />
-              </div>
-              <p>NIF - CIF: {providerSelected.taxIdentificationNumber}</p>
-              <p>Email: {providerSelected.email}</p>
-              <p>Teléfon: {providerSelected.phone}</p>
-              <p>Adreça: {providerSelected.address}</p>
-              <p>CP: {providerSelected.cityCode}</p>
-              <p>Població: {providerSelected.city}</p>
-              <p>País: {providerSelected.country}</p>
-              <p>Observacions: {providerSelected.observation}</p>
-              <label>
-                enviament Gratuït:
-                <input
-                  type="checkbox"
-                  checked={providerSelected.shipmentFree ? true : false}
-                  readOnly
-                />
-              </label>
-              <p>Idioma: {providerSelected.language}</p>
-              <p>Moneda: {providerSelected.currency}</p>
-              <p>Observacions d'enviamet:</p>
-              {sendObservationsList && sendObservationsList.length > 0 && sendObservationsList.map((item, index)=>(
-                <div key={index}>
-                <p>{item}</p>
-                </div>
-              ))}
 
-              <div className="optionBtn">
-                <img
-                  src={editar}
-                  alt="Editar"
-                  title="Editar"
-                  className="link"
-                  onClick={() => {
-                    setIsEdit(true);
-                  }}
-                />
+              <div className="provider_detail-container">
+                <p>NIF - CIF: {providerSelected.taxIdentificationNumber}</p>
+                <p>Email: {providerSelected.email}</p>
+                <p>Teléfon: {providerSelected.phone}</p>
+                <p>Adreça: {providerSelected.address}</p>
+                <p>
+                  Població: {providerSelected.cityCode} {providerSelected.city}{" "}
+                  ({providerSelected.country})
+                </p>
+                <p>Observacions: {providerSelected.observation}</p>
+
+                <div className="provider_options-detail">
+                  <h3>Configuració</h3>
+                  <div className="shipmentFree_item">
+                    <p>Enviament Gratuït: </p>
+                    <p>{providerSelected.shipmentFree ? 'Si' : 'No'}</p>
+                  </div>
+                  <p>Idioma: {providerSelected.language}</p>
+                  <p>Moneda: {providerSelected.currency}</p>
+                </div>
               </div>
-              <div className="optionBtn">
-                <img
-                  src={cancelar}
-                  alt="Cancelar"
-                  title="Cancelar"
-                  className="link"
-                  onClick={() => {
-                    btnClose();
-                  }}
-                />
+              <div className="provider_options-detail">
+                <h3>Observacions d'enviamet:</h3>
+                {sendObservationsList &&
+                  sendObservationsList.length > 0 &&
+                  sendObservationsList.map((item, index) => (
+                    <div key={index}>
+                      <p>{item}</p>
+                    </div>
+                  ))}
               </div>
-              <div className="optionBtn">
-                <img
-                  src={papelera}
-                  alt="Eliminar"
-                  title="Eliminar"
-                  className="link"
-                  onClick={() => {
-                    saveProvider(true);
-                  }}
-                />
+              <div className="buttons-box">
+                <div className="optionBtn">
+                  <img
+                    src={editar}
+                    alt="Editar"
+                    title="Editar"
+                    className="link"
+                    onClick={() => {
+                      setIsEdit(true);
+                    }}
+                  />
+                </div>
+                <div className="optionBtn">
+                  <img
+                    src={cancelar}
+                    alt="Cancelar"
+                    title="Cancelar"
+                    className="link"
+                    onClick={() => {
+                      btnClose();
+                    }}
+                  />
+                </div>
+
+                <div className="optionBtn">
+                  <img
+                    className="link"
+                    src={order}
+                    alt="Ordre de compra"
+                    title="Ordre de compra"
+                    onClick={() => {
+                      setPurchaseOrderVisible(true);
+                      getSuppliesProviders();
+                    }}
+                  />
+                </div>
+                <div className="optionBtn">
+                  <img
+                    src={papelera}
+                    alt="Eliminar"
+                    title="Eliminar"
+                    className="link"
+                    onClick={() => {
+                      saveProvider(true);
+                    }}
+                  />
+                </div>
               </div>
+              {showConfirm && (
+                <DeleteConfirm
+                  text = {providerSelected.name} 
+                  onAceptar = {() => dropProvider(true)}
+                  onCancelar = {() => dropProvider(false)}
+              />)}
             </div>
           )}
         </div>
@@ -470,15 +500,49 @@ const Providers = () => {
       {purchaseOrderVisible && (
         <div className="purchase_order-container">
           <h1>CREAR ORDRE DE COMPRA</h1>
-          <p>{providerSelected.name}</p>
-          {providerSelected.sendObservations && providerSelected.sendObservations.length > 0 && providerSelected.sendObservations.map((item, index)=>(
-            <div key={index}>
-            <input type="checkbox" onChange={(e)=>{
-              fnAddSendObservation(item, e.target.checked)
-            }}/>
-            <p>{item}</p>
-            </div>
-          ))}
+          <div className="buttons-box">
+          <div className="optionBtn link">
+            <img
+              src={cancelar}
+              alt="Cancelar"
+              title="Cancelar"
+              onClick={() => {
+                setPurchaseOrderVisible(false);
+              }}
+            />
+          </div>
+          <div className="optionBtn">
+          <img
+            className="link"
+            src={guardar}
+            alt="Guardar"
+            title="Guardar"
+            onClick={() => {
+              fnSaveOrder();
+              setPurchaseOrderVisible(false)
+            }}
+          />
+        </div>
+          </div>
+          <h3>{providerSelected.name}</h3>
+          <div className="sendOptions-box" >
+          <p>Observacions d'enviament</p>
+          {providerSelected.sendObservations &&
+            providerSelected.sendObservations.length > 0 &&
+            providerSelected.sendObservations.map((item, index) => (
+              <div key={index} >
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    fnAddSendObservation(item, e.target.checked);
+                  }}
+                />
+                <p>{item}</p>
+              </div>
+            ))}
+          
+          </div>
+
           {suppliesProviderData &&
             suppliesProviderData.length > 0 &&
             suppliesProviderData.map((item, index) => (
@@ -487,7 +551,7 @@ const Providers = () => {
                 <p className="purchase_supply-description">
                   {item.description}
                 </p>
-                <p className="purchase_supply-price">{item.price} €</p>
+                <p className="purchase_supply-price">{item.price} {providerSelected.currency}</p>
                 <input
                   className="purchase_supply-units"
                   type="number"
@@ -497,7 +561,7 @@ const Providers = () => {
                 />
 
                 {addVisible && addVisible.key === index && (
-                  <div className="optionBtn link">
+                  <div className="optionBtnList link">
                     <img
                       src={agregar}
                       alt="Afegir"
@@ -510,43 +574,38 @@ const Providers = () => {
                 )}
               </div>
             ))}
-          <div className="optionBtn link">
-            <img
-              src={cancelar}
-              alt="Cancelar"
-              title="Cancelar"
-              onClick={() => {
-                setPurchaseOrderVisible(false);
-              }}
-            />
-          </div>
+          
           <div>
-          <h1>ORDRE DE COMPRA</h1>
-          <div className="optionBtn">
-          <img 
-          className="link"
-          src={guardar} 
-          alt="Guardar" 
-          title="Guardar" 
-          onClick={()=>{
-            fnSaveOrder()
-          }}/>
-          </div>
-          {purchaseOrderTotal && purchaseOrderTotal > 0 && <p>Import ordre de compra: {purchaseOrderTotal} €</p>}
-          {purchaseOrderItems && purchaseOrderItems.length > 0 && purchaseOrderItems.map((item, index)=>(
-            <div key={index} className="purchase_order-item">
-            <p className="purchase_supply-code">{item.code}</p>
-            <p className="purchase_supply-description">{item.name}</p>
-            <p className="purchase_supply-price">{item.price} €/u.</p>
-            <p className="purchase_supply-units-detail">{item.units} u</p>
-            <p className="purchase_supply-price">{item.units * item.price} €</p>
+            <h2>ORDRE DE COMPRA</h2>
 
-            </div>
-          ))}
+            {purchaseOrderTotal && purchaseOrderTotal > 0 && (
+              <h3>Import ordre de compra: {purchaseOrderTotal} {providerSelected.currency}</h3>
+            )}
+            <div className="purchase_order-item header-list">
+                  <p className="purchase_supply-code">codi</p>
+                  <p className="purchase_supply-description">nom</p>
+                  <p className="purchase_supply-price">preu/u.</p>
+                  <p className="purchase_supply-units-detail"> unitats</p>
+                  <p className="purchase_supply-price">
+                    subTotal
+                  </p>
+                </div>
+            {purchaseOrderItems &&
+              purchaseOrderItems.length > 0 &&
+              purchaseOrderItems.map((item, index) => (
+                <div key={index} className="purchase_order-item">
+                  <p className="purchase_supply-code">{item.code}</p>
+                  <p className="purchase_supply-description">{item.name}</p>
+                  <p className="purchase_supply-price">{item.price} {providerSelected.currency}/u.</p>
+                  <p className="purchase_supply-units-detail">{item.units} u</p>
+                  <p className="purchase_supply-price">
+                    {item.units * item.price} {providerSelected.currency}
+                  </p>
+                </div>
+              ))}
           </div>
         </div>
       )}
-
     </div>
   );
 };

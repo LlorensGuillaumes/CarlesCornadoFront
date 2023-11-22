@@ -7,6 +7,7 @@ import cancelar from "../../Images/icons/cancelar.png";
 import papelera from "../../Images/icons/papelera.png";
 import agregar from "../../Images/icons/agregar.png";
 import editar from "../../Images/icons/editar.png";
+import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
 
 const Processes = () => {
 const [processesData, setProcessesData] = useState([]);
@@ -18,6 +19,7 @@ const [optionsVisible, setOptionsVisible] = useState({
 visible: false,
 id: "",
 });
+const [showConfirm, setShowConfirm] = useState(false)
 
 useEffect(() => {
 {
@@ -44,10 +46,8 @@ getProcesses();
 
 const saveProcess = (isDelete = false) => {
 if (isDelete) {
-    const processToDelete = processSelected._id;
-    api.delete(`/processes/delete/${processToDelete}`).then((response) => {
-    getProcesses();
-    });
+    setShowConfirm(true)
+    
 } else {
     const newProcessToSave = {
     name: newProcess,
@@ -69,11 +69,22 @@ if (isDelete) {
 }
 setOptionsVisible({ visible: false, id: "" });
 };
+const dropProcess = (confirm)=>{
+    if(confirm){
+    const processToDelete = processSelected._id;
+    api.put(`/processes/delete/${processToDelete}`).then((response) => {
+    getProcesses();
+    });
+    }
+    setShowConfirm(false);
+
+}
 
 return (
 <div className="procesess">
 <div className="optionBtn link" onClick={() => {
     setIsNew(true);
+    setIsEdit(false);
 }}>
 <img 
 src={agregar} 
@@ -90,6 +101,7 @@ title="Nou Procés"
             className="procesess-item link"
             onClick={() => {
             setProcessSelected(process);
+            setIsNew(false)
             }}
         >
             <p>{process.name}</p>
@@ -133,12 +145,13 @@ title="Nou Procés"
     </div>
 
     {isEdit && (
-    <div>
+    <div className="processes_modify">
         <input
         type="text"
         defaultValue={processSelected.name}
         onChange={(e) => setNewProcess(e.target.value)}
         />
+        <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
         <img
             src={aceptar}
@@ -161,40 +174,50 @@ title="Nou Procés"
             }}
         />
         </div>
+        </div>
     </div>
     )}
     {isNew && (
-    <div>
+    <div className="processes_modify">
         <input
         placeholder="Nou procés"
         onChange={(e) => setNewProcess(e.target.value)}
         />
+        <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
-        <img
-            src={aceptar}
-            title="Guardar"
-            alt="Guardar"
-            className="link"
-            onClick={() => {
-            setIsNew(false);
-            saveProcess();
-            }}
-        />
+            <img
+                src={aceptar}
+                title="Guardar"
+                alt="Guardar"
+                className="link"
+                onClick={() => {
+                setIsNew(false);
+                saveProcess();
+                }}
+            />
         </div>
 
         <div className="optionBtn">
-        <img
-            src={cancelar}
-            title="Cancelar"
-            alt="Cancelar"
-            className="link"
-            onClick={() => {
-            setIsNew(false);
-            }}
-        />
+            <img
+                src={cancelar}
+                title="Cancelar"
+                alt="Cancelar"
+                className="link"
+                onClick={() => {
+                setIsNew(false);
+                }}
+            />
+        </div>
+        
         </div>
     </div>
     )}
+    {showConfirm && (
+        <DeleteConfirm
+        text = {processSelected.name} 
+        onAceptar = {() => dropProcess(true)}
+        onCancelar = {() => dropProcess(false)}
+    />)}
 </div>
 );
 };

@@ -6,7 +6,9 @@ import aceptar from "../../Images/icons/aceptar.png";
 import cancelar from "../../Images/icons/cancelar.png";
 import agregar from "../../Images/icons/agregar.png";
 import editar from "../../Images/icons/editar.png";
+import papelera from "../../Images/icons/papelera.png";
 import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
+import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
 
 const Components = () => {
 const [componentsData, setComponentsData] = useState([]);
@@ -14,6 +16,7 @@ const [providersData, setprovidersData] = useState([]);
 const [processesData, setProcessesData] = useState([]);
 const [componentDetailVisible, setComponentDetailVisible] = useState(false);
 const [componentSelected, setComponentSelected] = useState(null);
+const [showConfirm, setShowConfirm] = useState(false);
 
 const [providersList, setProviderList] = useState([]);
 const [processesList, setProcessesList] = useState([]);
@@ -30,6 +33,8 @@ const [componentReference, setComponentReference] = useState();
 const [sanitaryComponentReference, setSanitaryComponentReference] =
 useState();
 const [description, setDescription] = useState();
+const [price, setPrice] = useState();
+const [priceSale, setPriceSale] = useState();
 
 useEffect(() => {
 getComponents();
@@ -74,16 +79,15 @@ api
     });
 };
 
-useEffect(()=>{
-    setProviderDataFiltered([...providersData]);
-    setProcessesDataFiltered([...processesData]);
-    setEquivalencesDataFiltered([...componentsData]);
-
-},[providersData, processesData, componentsData]);
-
+useEffect(() => {
+setProviderDataFiltered([...providersData]);
+setProcessesDataFiltered([...processesData]);
+setEquivalencesDataFiltered([...componentsData]);
+}, [providersData, processesData, componentsData]);
 
 const btnClose = () => {
 setComponentDetailVisible(false);
+setComponentSelected({});
 setIsEdit(false);
 setIsNew(false);
 };
@@ -98,8 +102,7 @@ const relation = {
 switch (item) {
     case "provider":
     isChecked
-        ? 
-        setProviderList((prevList) => [...prevList, relation])
+        ? setProviderList((prevList) => [...prevList, relation])
         : setProviderList((prevList) =>
             prevList.filter((item) => item.id !== relationId)
         );
@@ -121,101 +124,127 @@ switch (item) {
     default:
     console.log("error");
 }
-
 };
 
 const selectComponent = (component) => {
-    setComponentSelected(component)
-    const equivalences = component.equivalences;
-    const processes = component.processes;
-    const providers = component.providers;
+setComponentSelected(component);
+const equivalences = component.equivalences;
+const processes = component.processes;
+const providers = component.providers;
 
-    setProviderList([]);
-    setProcessesList([]);
-    setEquivalencesList([]);
+setProviderList([]);
+setProcessesList([]);
+setEquivalencesList([]);
 
-    for (const equivalence of equivalences) {
-        componentRelations(true, equivalence._id, equivalence.componentReference, 'component');
-    };
-    for (const process of processes) {
-        componentRelations(true, process._id, process.name, 'process');
-    };
-    for (const provider of providers) {
-        componentRelations(true, provider._id, provider.name, 'provider');
-    }
+for (const equivalence of equivalences) {
+    componentRelations(
+    true,
+    equivalence._id,
+    equivalence.componentReference,
+    "component"
+    );
 }
+for (const process of processes) {
+    componentRelations(true, process._id, process.name, "process");
+}
+for (const provider of providers) {
+    componentRelations(true, provider._id, provider.name, "provider");
+}
+};
 
 const newComponent = () => {
-    const newComponent = {
-        componentReference: componentReference,
-        sanitaryComponentReference: sanitaryComponentReference,
-        description: description,
-        equivalences: TreatyArray.dropDuplicatesAndEmpty(equivalencesList.map((item)=>(item.id))),
-        processes: TreatyArray.dropDuplicatesAndEmpty(processesList.map((item)=>(item.id))),
-        providers: TreatyArray.dropDuplicatesAndEmpty(providersList.map((item)=>(item.id))),
-    }
+const newComponent = {
+    componentReference: componentReference,
+    sanitaryComponentReference: sanitaryComponentReference,
+    description: description,
+    price: price,
+    priceSale: priceSale,
+    equivalences: TreatyArray.dropDuplicatesAndEmpty(
+    equivalencesList.map((item) => item.id)
+    ),
+    processes: TreatyArray.dropDuplicatesAndEmpty(
+    processesList.map((item) => item.id)
+    ),
+    providers: TreatyArray.dropDuplicatesAndEmpty(
+    providersList.map((item) => item.id)
+    ),
+};
 
-    {isNew ? 
-        api
-        .post('/components/create', newComponent)
-        .then((response)=>{
-            getComponents()
+{
+    isNew
+    ? api.post("/components/create", newComponent).then((response) => {
+        getComponents();
         })
-
-        :
-
-        api
+    : api
         .put(`/components/edit/${componentSelected._id}`, newComponent)
-        .then((response)=>{
-            getComponents()
-        })
+        .then((response) => {
+            getComponents();
+        });
 }
 setComponentDetailVisible(false);
 setComponentSelected(null);
-    
-    }
+};
 
-
-useEffect(()=>{
-    if(componentSelected){
-setComponentReference(componentSelected.componentReference);
-setSanitaryComponentReference(componentSelected.sanitaryComponentReference)
-setDescription(componentSelected.description)
-
-    }
-
-},[componentSelected])
+useEffect(() => {
+if (componentSelected) {
+    setComponentReference(componentSelected.componentReference);
+    setSanitaryComponentReference(
+    componentSelected.sanitaryComponentReference
+    );
+    setDescription(componentSelected.description);
+}
+}, [componentSelected]);
 
 const fnFilter = (item, value) => {
 switch (item) {
-    case 'provider':
-    const filteredProviders = providersData.filter(provider =>
+    case "provider":
+    const filteredProviders = providersData.filter((provider) =>
         provider.name.toLowerCase().includes(value.toLowerCase())
     );
     setProviderDataFiltered(filteredProviders);
     break;
-    case 'process':
-    const filteredProcesses = processesData.filter(process =>
+    case "process":
+    const filteredProcesses = processesData.filter((process) =>
         process.name.toLowerCase().includes(value.toLowerCase())
     );
     setProcessesDataFiltered(filteredProcesses);
     break;
-    case 'component':
-    const filteredComponents = componentsData.filter(component =>
-        component.componentReference.toLowerCase().includes(value.toLowerCase()) || component.description.toLowerCase().includes(value.toLowerCase())
+    case "component":
+    const filteredComponents = componentsData.filter(
+        (component) =>
+        component.componentReference
+            .toLowerCase()
+            .includes(value.toLowerCase()) ||
+        component.description.toLowerCase().includes(value.toLowerCase())
     );
     setEquivalencesDataFiltered(filteredComponents);
     break;
     default:
-    console.log('error');
+    console.log("error");
 }
 };
 
+const dropComponent = (confirm) => {
+    if(confirm){
+        api.put(`/components/delete/${componentSelected._id}`)
+        .then((response)=>{
+            getComponents()
+            btnClose()
+        })
+    }
+    setShowConfirm(false);
+
+};
 
 return (
 <div className="component">
-<div className="optionBtn">
-<img  className="link" src={agregar} alt="agregar" title="Nou component" onClick={() => {
+    <div className="optionBtn">
+    <img
+        className="link"
+        src={agregar}
+        alt="agregar"
+        title="Nou component"
+        onClick={() => {
         setIsNew(true);
         setIsEdit(false);
         setComponentDetailVisible(true);
@@ -223,9 +252,9 @@ return (
         setProviderList([]);
         setEquivalencesList([]);
         setProcessesList([]);
-        }
-}/>
-</div>
+        }}
+    />
+    </div>
     <div className="component-container">
     {componentsData &&
         componentsData.length > 0 &&
@@ -249,6 +278,32 @@ return (
         {isEdit || isNew ? (
             <div className="component-detail-container">
             {isNew ? <h1>NOU COMPONENT</h1> : <h1>MODIFICAR COMPONENT</h1>}
+            <div className="buttons-box">
+                <div className="optionBtn">
+                <img
+                    src={aceptar}
+                    alt="aceptar"
+                    className="link"
+                    title="Guardar"
+                    onClick={() => {
+                    newComponent();
+                    }}
+                />
+                </div>
+
+                <div className="optionBtn">
+                <img
+                    src={cancelar}
+                    alt="cancelar"
+                    className="link"
+                    title="Cancelar"
+                    onClick={() => {
+                    btnClose();
+                    }}
+                />
+                </div>
+            </div>
+            <div className="productsItemContainer">
             <input
                 defaultValue={
                 !isNew ? componentSelected.componentReference : ""
@@ -277,15 +332,41 @@ return (
                 }}
                 className="text_input"
             />
+            <input
+            defaultValue={!isNew ? componentSelected.price : ""}
+            placeholder="preu"
+            onChange={(e) => {
+            setPrice(e.target.value);
+            }}
+            className="text_input"
+        />
+        <input
+        defaultValue={!isNew ? componentSelected.priceSale : ""}
+        placeholder="preu Venta"
+        onChange={(e) => {
+        setPriceSale(e.target.value);
+        }}
+        className="text_input"
+    />
+    </div>
             <div className="headboard">
                 <p>Proveidors</p>
                 <p>Processos</p>
                 <p>Equivalències</p>
             </div>
             <div className="headbord-filter">
-                <input placeholder="buscar proveïdor" onChange={(e)=>fnFilter('provider', e.target.value)}/>
-                <input placeholder="buscar procés" onChange={(e)=>fnFilter('process', e.target.value)}/>
-                <input placeholder="buscar ref. o nom" onChange={(e)=>fnFilter('component', e.target.value)}/>
+                <input
+                placeholder="buscar proveïdor"
+                onChange={(e) => fnFilter("provider", e.target.value)}
+                />
+                <input
+                placeholder="buscar procés"
+                onChange={(e) => fnFilter("process", e.target.value)}
+                />
+                <input
+                placeholder="buscar ref. o nom"
+                onChange={(e) => fnFilter("component", e.target.value)}
+                />
             </div>
 
             {isNew ? (
@@ -354,21 +435,19 @@ return (
                     ))}
                 </div>
                 </div>
-            ) : 
-        
-        
-
-
-            <div className="optionsSelector">
+            ) : (
+                <div className="optionsSelector">
                 <div className="list-container">
                     {providersDataFiltered &&
-                        providersDataFiltered.length > 0 &&
-                        providersDataFiltered.map((provider, index) => (
+                    providersDataFiltered.length > 0 &&
+                    providersDataFiltered.map((provider, index) => (
                         <div className="list-check" key={index}>
                         <input
                             type="checkbox"
                             className="checkbox-style"
-                            checked = {providersList.some((item)=>item.id === provider._id)}
+                            checked={providersList.some(
+                            (item) => item.id === provider._id
+                            )}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -384,13 +463,15 @@ return (
                 </div>
                 <div className="list-container">
                     {processesDataFiltered &&
-                        processesDataFiltered.length > 0 &&
-                        processesDataFiltered.map((process, index) => (
+                    processesDataFiltered.length > 0 &&
+                    processesDataFiltered.map((process, index) => (
                         <div className="list-check" key={index}>
                         <input
                             type="checkbox"
                             className="checkbox-style"
-                            checked = {processesList.some((item)=>item.id === process._id)}
+                            checked={processesList.some(
+                            (item) => item.id === process._id
+                            )}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -406,13 +487,15 @@ return (
                 </div>
                 <div className="list-container">
                     {equivalencesDataFiltered &&
-                        equivalencesDataFiltered.length > 0 &&
-                        equivalencesDataFiltered.map((component, index) => (
+                    equivalencesDataFiltered.length > 0 &&
+                    equivalencesDataFiltered.map((component, index) => (
                         <div className="list-check" key={index}>
                         <input
                             type="checkbox"
                             className="checkbox-style"
-                            checked = {equivalencesList.some((item)=>item.id === component._id)}
+                            checked={equivalencesList.some(
+                            (item) => item.id === component._id
+                            )}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -427,12 +510,7 @@ return (
                     ))}
                 </div>
                 </div>
-        
-        
-        
-        
-        
-        }
+            )}
 
             <h2>SELECCIONATS</h2>
             <div className="optionsSelector">
@@ -463,22 +541,42 @@ return (
                     </div>
                     ))}
                 </div>
+                
             </div>
-            <div>
-                <div className="optionBtn">
+    
+
+
+            </div>
+        ) : (
+            <div className="component-detail-container">
+            <div className="buttons-box">
+                <div className="optionBtn link">
                 <img
-                    src={aceptar}
-                    alt="aceptar"
-                    className="link"
-                    title="Guardar"
-                    onClick={()=>{newComponent()}}
+                    src={editar}
+                    alt="editar"
+                    title="Editar"
+                    onClick={() => {
+                    setIsEdit(true);
+                    setIsNew(false);
+                    getEditData();
+                    }}
                 />
                 </div>
                 <div className="optionBtn">
                 <img
+                    src={papelera}
+                    alt="eliminar"
+                    className="link"
+                    title="Eliminar"
+                    onClick={() => {
+                    setShowConfirm(true);
+                    }}
+                />
+                </div>
+                <div className="optionBtn link">
+                <img
                     src={cancelar}
                     alt="cancelar"
-                    className="link"
                     title="Cancelar"
                     onClick={() => {
                     btnClose();
@@ -486,28 +584,15 @@ return (
                 />
                 </div>
             </div>
-            </div>
-        ) : (
-            <div className="component-detail-container">
-            <div className="optionBtn link">
-            <img src={editar} alt="editar" title="Editar"   onClick={() => {
-                setIsEdit(true);
-                setIsNew(false);
-                getEditData();
-                }}/>
-            </div>
-            <div className="optionBtn link">
-            <img src={cancelar} alt="cancelar" title="Cancelar"   onClick={() => {
-                btnClose();
-                }}/>
-            </div>
-            <h1>{componentSelected.componentReference}</h1>
+            <h1>{componentSelected.description}</h1>
+            <h1>
+                {componentSelected.componentReference}{" "}
+                {componentSelected.sanitaryComponentReference &&
+                `(${componentSelected.sanitaryComponentReference})`}
+            </h1>
+            <p>Preu compra: {componentSelected.price} €</p>
+            <p>Preu venta: {componentSelected.priceSale} €</p>
 
-            <p>
-                Referència sanitària:{" "}
-                {componentSelected.sanitaryComponentReference}
-            </p>
-            <p>Nom: {componentSelected.description}</p>
             <h2>Equivalències</h2>
             {componentSelected.equivalences &&
                 componentSelected.equivalences.length > 0 &&
@@ -534,6 +619,12 @@ return (
                 ))}
             </div>
         )}
+        {showConfirm && (
+            <DeleteConfirm
+            text = {componentSelected.componentReference} 
+            onAceptar = {() => dropComponent(true)}
+            onCancelar = {() => dropComponent(false)}
+        />)}
         </div>
     )}
     </div>

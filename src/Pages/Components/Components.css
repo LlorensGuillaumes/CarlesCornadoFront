@@ -13,6 +13,7 @@
     display: flex;
     flex-direction: column;
     width: 30%;
+    padding: 1.5rem;
     align-items: center;
     background-color: beige;
     margin: 2rem;
@@ -27,16 +28,17 @@
     position: absolute;
     top: 0px;
     left: 0;
-    /* top: 70%;
-    left: 50%;
-    transform: translate(-50%, -50%); */
     z-index: 5;
     background-color: beige;
     border-radius: 2rem;
 }
+.component-detail-container h1 {
+    margin-bottom: 0px;
+}
 .list-check{
     display: flex;
-    width: 100%
+    width: 100%;
+    margin-top: 0.5rem;
 }
 .optionsSelector{
     display: flex;
