@@ -172,6 +172,7 @@ title="Nou Procés"
         className="process_select-provider" 
         onChange={(e)=>setNewProcessProvider(e.target.value)}
         value={processSelected.provider}>
+        <option>Selecciona proveïdor</option>
         <option>Safident</option>
         {providersData && providersData.length > 0 && providersData.map((item, index)=>(
             <option key={index}>{item.name}</option>
