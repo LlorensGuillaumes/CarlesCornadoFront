@@ -8,6 +8,7 @@ import papelera from "../../Images/icons/papelera.png";
 import agregar from "../../Images/icons/agregar.png";
 import editar from "../../Images/icons/editar.png";
 import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
+import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 
 const Processes = () => {
 const [processesData, setProcessesData] = useState([]);
@@ -17,17 +18,17 @@ const [isEdit, setIsEdit] = useState(false);
 const [processSelected, setProcessSelected] = useState(null);
 const [newProcessName, setNewProcessName] = useState("");
 const [newProcessProvider, setNewProcessProvider] = useState("");
+const [price, setPrice] = useState("");
+const [priceVisible, setPriceVisible] = useState(0);
 const [optionsVisible, setOptionsVisible] = useState({
 visible: false,
 id: "",
 });
-const [showConfirm, setShowConfirm] = useState(false)
+const [showConfirm, setShowConfirm] = useState(false);
 
 useEffect(() => {
 {
-    processSelected
-    ? setOptionsVisible({ visible: true, id: processSelected._id })
-    : setOptionsVisible({ visible: false, id: "" });
+    processSelected ? setOptionsVisible(true) : setOptionsVisible(false);
 }
 }, [processSelected]);
 
@@ -42,33 +43,32 @@ api
     });
 };
 const getProviders = () => {
-    api.get('/providers')
-    .then((response)=>{
-        setProvidersData(response)
+api
+    .get("/providers")
+    .then((response) => {
+    setProvidersData(TreatyArray.alphabetical(response, "name"));
     })
     .catch((error) => {
-    console.log(error)
-
+    console.log(error);
     });
-    
-}
+};
 
-useState(() => {
+useEffect(() => {
 getProcesses();
 getProviders();
 }, []);
 
 const saveProcess = (isDelete = false) => {
 if (isDelete) {
-    setShowConfirm(true)
-    
+    setShowConfirm(true);
 } else {
     const newProcessToSave = {
-    name: newProcessName,
-    provider: newProcessProvider,
+    name: processSelected.name,
+    providers: processSelected.providers,
+    price: processSelected.price,
     };
 
-    console.log(newProcessToSave)
+    console.log(newProcessToSave);
     {
     isNew
         ? api.post("/processes/create", newProcessToSave).then((response) => {
@@ -85,29 +85,29 @@ if (isDelete) {
 }
 setOptionsVisible({ visible: false, id: "" });
 };
-const dropProcess = (confirm)=>{
-    if(confirm){
+const dropProcess = (confirm) => {
+if (confirm) {
     const processToDelete = processSelected._id;
     api.put(`/processes/delete/${processToDelete}`).then((response) => {
     getProcesses();
     });
-    }
-    setShowConfirm(false);
-
 }
+setShowConfirm(false);
+};
+console.log(processSelected);
+console.log(optionsVisible);
 
 return (
 <div className="procesess">
-<div className="optionBtn link" onClick={() => {
-    setIsNew(true);
-    setIsEdit(false);
-}}>
-<img 
-src={agregar} 
-alt="agregar" 
-title="Nou Procés"  
-/>
-</div>
+    <div
+    className="optionBtn link"
+    onClick={() => {
+        setIsNew(true);
+        setIsEdit(false);
+    }}
+    >
+    <img src={agregar} alt="agregar" title="Nou Procés" />
+    </div>
     <div className="processes-list">
     {processesData &&
         processesData.length > 0 &&
@@ -117,45 +117,43 @@ title="Nou Procés"
             className="procesess-item link"
             onClick={() => {
             setProcessSelected(process);
-            setIsNew(false)
             }}
         >
             <p>{process.name}</p>
-            <p>{process.provider}</p>
-
+            {process.providers && <p>{process.providers.name}</p>}
+            {process.price && <p>{process.price}</p>}
             <div className="papelera-container">
-            {optionsVisible.visible &&
-                optionsVisible.id === process._id && (
+            {processSelected && processSelected._id === process._id && (
                 <div className="processes-options">
-                    <img
+                <img
                     src={papelera}
                     alt="eliminar"
                     title="Eliminar"
                     className="link optionItem"
                     onClick={() => {
-                        saveProcess(true);
+                    saveProcess(true);
                     }}
-                    />
-                    <img
+                />
+                <img
                     src={editar}
                     alt="editar"
                     title="Editar"
                     className="link optionItem"
                     onClick={() => {
-                        setIsEdit(true);
+                    setIsEdit(true);
                     }}
-                    />
-                    <img
+                />
+                <img
                     src={cancelar}
                     alt="cacelar"
                     title="Cancelar"
                     className="link optionItem"
                     onClick={() => {
-                        setOptionsVisible({ visible: false, id: "" });
+                    setOptionsVisible({ visible: false, id: "" });
                     }}
-                    />
+                />
                 </div>
-                )}
+            )}
             </div>
         </div>
         ))}
@@ -166,40 +164,70 @@ title="Nou Procés"
         <input
         type="text"
         defaultValue={processSelected.name}
-        onChange={(e) => setNewProcessName(e.target.value)}
+        onChange={(e) => 
+            setProcessSelected((prevProcessSelected) => ({
+                ...prevProcessSelected,
+                name: e.target.value,
+                }))
+        }
         />
-        <select 
-        className="process_select-provider" 
-        onChange={(e)=>setNewProcessProvider(e.target.value)}
-        value={processSelected.provider}>
-        <option>Selecciona proveïdor</option>
-        <option>Safident</option>
-        {providersData && providersData.length > 0 && providersData.map((item, index)=>(
-            <option key={index}>{item.name}</option>
-        ))}
+        <select
+        className="process_select-provider"
+        value={
+            processSelected.providers
+            ? processSelected.providers.name || ""
+            : ""
+        }
+        onChange={(e) => {
+            setProcessSelected((prevProcessSelected) => ({
+            ...prevProcessSelected,
+            providers: { name: e.target.value },
+            }))
+            e.target.value !== "Safident" ? setPriceVisible(true) : setPriceVisible(false);
+        }}
+        >
+        <option value="">Selecciona proveïdor</option>
+        {providersData &&
+            providersData.length > 0 &&
+            providersData.map((item, index) => (
+            <option key={index} value={item.name}>
+                {item.name}
+            </option>
+            ))}
         </select>
+        {priceVisible && processSelected.providers !== "Safident" &&
+            <input 
+                placeholder="Preu" 
+                onChange={(e) => {
+                    setProcessSelected((prevProcessSelected) => ({
+                        ...prevProcessSelected,
+                        price: e.target.value,
+                    }));
+                }}
+            />
+        }
         <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
-        <img
+            <img
             src={aceptar}
             title="Guardar"
             alt="Guardar"
             className="link"
             onClick={() => {
-            saveProcess();
+                saveProcess();
             }}
-        />
+            />
         </div>
         <div className="optionBtn">
-        <img
+            <img
             src={cancelar}
             title="Cancelar"
             alt="Cancelar"
             className="link"
             onClick={() => {
-            setIsEdit(false);
+                setIsEdit(false);
             }}
-        />
+            />
         </div>
         </div>
     </div>
@@ -210,49 +238,55 @@ title="Nou Procés"
         placeholder="Nou procés"
         onChange={(e) => setNewProcessName(e.target.value)}
         />
-        <select className="process_select-provider" 
-        onChange={(e)=>setNewProcessProvider(e.target.value)}>
+        <select
+        className="process_select-provider"
+        onChange={(e) => {
+            setNewProcessProvider(e.target.value);
+            e.target.value !== "Safident" && setPriceVisible(true);
+        }}
+        >
         <option>Selecciona proveïdor</option>
-        <option>Safident</option>
-        {providersData && providersData.length > 0 && providersData.map((item, index)=>(
+        {providersData &&
+            providersData.length > 0 &&
+            providersData.map((item, index) => (
             <option key={index}>{item.name}</option>
-        ))}
+            ))}
         </select>
         <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
             <img
-                src={aceptar}
-                title="Guardar"
-                alt="Guardar"
-                className="link"
-                onClick={() => {
+            src={aceptar}
+            title="Guardar"
+            alt="Guardar"
+            className="link"
+            onClick={() => {
                 setIsNew(false);
                 saveProcess();
-                }}
+            }}
             />
         </div>
 
         <div className="optionBtn">
             <img
-                src={cancelar}
-                title="Cancelar"
-                alt="Cancelar"
-                className="link"
-                onClick={() => {
+            src={cancelar}
+            title="Cancelar"
+            alt="Cancelar"
+            className="link"
+            onClick={() => {
                 setIsNew(false);
-                }}
+            }}
             />
         </div>
-        
         </div>
     </div>
     )}
     {showConfirm && (
-        <DeleteConfirm
-        text = {processSelected.name} 
-        onAceptar = {() => dropProcess(true)}
-        onCancelar = {() => dropProcess(false)}
-    />)}
+    <DeleteConfirm
+        text={processSelected.name}
+        onAceptar={() => dropProcess(true)}
+        onCancelar={() => dropProcess(false)}
+    />
+    )}
 </div>
 );
 };

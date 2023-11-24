@@ -167,14 +167,14 @@ return (
             purchaseOrderSelected.provisioning.map((item, index) => (
             <div key={index} className="order_list">
                 <p className="purchase-order_units">{item.units}x</p>
-                <p className="purchase-order_code">{item.idSuply.code}</p>
+                <p className="purchase-order_code">{item.idSuply.code}{item.idSuply.productReference}</p>
                 <p className="purchase-order_name">{item.idSuply.description}</p>
                 <p className="purchase-order_price">{item.price}{purchaseOrderSelected.provider.currency}</p>
                 <p className="purchase-order_price">{item.units * item.price}{purchaseOrderSelected.provider.currency}</p>
             </div>
             ))}
             <h3 className="purchase-order_total">TOTAL: {purchaseOrderSelected.total}{purchaseOrderSelected.provider.currency}</h3>
-            <h3>{purchaseOrderSelected.sendObservations}</h3>
+            <h3>{purchaseOrderSelected.sendObservations}</h3> 
             <p className="purchase-order_nota">
             {purchaseOrderSelected.provider.language === "Català" ? 
             'NOTA: La seva homologació com a proveïdor serà avaluada de forma continua considerant la satisfacció del clent final.' 

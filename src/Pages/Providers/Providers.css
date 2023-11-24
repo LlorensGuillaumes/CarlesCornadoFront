@@ -132,3 +132,14 @@ flex-wrap: wrap;
     padding-left: 1rem;
     padding-bottom: 1rem;
 }
+.selectGroup{
+    display: flex;
+}
+.selectGroupItem{
+    display: flex;
+    align-items: center;
+    margin-right: 1rem
+}
+.selectGroupItem input{
+    margin-right: 0.2rem;
+}

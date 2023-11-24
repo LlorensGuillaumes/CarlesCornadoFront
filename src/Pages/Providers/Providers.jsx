@@ -16,6 +16,7 @@ const Providers = () => {
   const [suppliesProviderData, setSuppliesProviderData] = useState([]);
   const [componentsProvidersData, setComponentsProvidersData] = useState([]);
   const [productsProvidersData, setProductsProvidersData] = useState([]);
+  const [processesProvidersData, setProcessesProviderData] = useState([]);
   const [providerDetailVisible, setProviderDetailVisible] = useState(false);
   const [purchaseOrderVisible, setPurchaseOrderVisible] = useState(false);
   const [groupSelected, setGroupSelected] = useState("1");
@@ -90,17 +91,28 @@ const Providers = () => {
 
   const getComponentsProviders = () =>{
     api
-      .get(`/provisioning/provider/${providerSelected._id}`)
+      .get(`/components/provider/${providerSelected._id}`)
       .then((response) => {
-        setSuppliesProviderData(
+        setComponentsProvidersData(
           TreatyArray.alphabetical(response, "description")
         );
       });
   }
-
-  const getProductsProviders = () => {
-
+  const getProductsProviders = () =>{
+    api.get(`/products/provider/${providerSelected._id}`)
+    .then((response)=> {
+      setProductsProvidersData(response)
+    })
   }
+
+  const getProcessesProviders = () => {
+    api.get(`/processes/provider/${providerSelected._id}`)
+    .then((response) => {
+      console.log(response)
+      setProcessesProviderData(response)
+    })    
+  }
+
   const btnClose = () => {
     setProviderDetailVisible(false);
     setIsEdit(false);
@@ -159,6 +171,7 @@ const Providers = () => {
     setShowConfirm(false);
   };
   const fnChangeUtis = (index, value, item) => {
+    console.log(item)
     {
       value >= 0
         ? setAddVisible({ key: index, units: value, id: item })
@@ -170,8 +183,19 @@ const Providers = () => {
       id: addVisible.id._id,
       units: addVisible.units,
       price: addVisible.id.price,
-      code: addVisible.id.code,
+      code: groupSelected === "1" ? 
+            addVisible.id.code : 
+            groupSelected === '2' ?
+            addVisible.id.componentReference :
+            groupSelected === "3" ? 
+            addVisible.id.productReference : "",
       name: addVisible.id.description,
+      type: groupSelected === "1" ? 
+            'provisioning' : 
+            groupSelected === "2" ?
+            'components' :
+            groupSelected === "3" ? 
+            'products' : "",
     };
 
     const purchaseItemsNotActual = purchaseOrderItems.filter(
@@ -201,6 +225,7 @@ const Providers = () => {
         idSuply: item.id,
         units: parseInt(item.units),
         price: parseInt(item.price),
+        type: item.type,
       };
       if (provisioning.units !== 0) {
         provisioningItems.push(provisioning);
@@ -224,7 +249,6 @@ const Providers = () => {
       setPurchaseSendObservations(sendObservationsWithoutSendObservation);
     }
   };
-
   return (
     <div className="provider">
       <div
@@ -493,6 +517,7 @@ const Providers = () => {
                       getSuppliesProviders();
                       getComponentsProviders();
                       getProductsProviders();
+                      getProcessesProviders();
                     }}
                   />
                 </div>
@@ -563,8 +588,8 @@ const Providers = () => {
                 </div>
               ))}
           </div>
-          <div>
-            <label>
+          <div className="selectGroup">
+            <label className="selectGroupItem">
               <input
                 type="radio"
                 value="1"
@@ -576,7 +601,7 @@ const Providers = () => {
               Aprovisionaments
             </label>
 
-            <label>
+            <label className="selectGroupItem">
               <input
                 type="radio"
                 value="2"
@@ -588,7 +613,7 @@ const Providers = () => {
               Components
             </label>
 
-            <label>
+            <label className="selectGroupItem">
               <input
                 type="radio"
                 value="3"
@@ -599,15 +624,129 @@ const Providers = () => {
               />
               Productes
             </label>
+            <label className="selectGroupItem">
+              <input
+                type="radio"
+                value="4"
+                checked={groupSelected === "4"}
+                onChange={() => {
+                  fnChangeGroupSelected("4");
+                }}
+              />
+              Processos
+            </label>
           </div>
 
-          {suppliesProviderData &&
+          {groupSelected === "1" && suppliesProviderData &&
             suppliesProviderData.length > 0 &&
             suppliesProviderData.map((item, index) => (
               <div key={index} className="purchase_order-item">
                 <p className="purchase_supply-code">{item.code}</p>
                 <p className="purchase_supply-description">
                   {item.description}
+                </p>
+                <p className="purchase_supply-price">
+                  {item.price} {providerSelected.currency}
+                </p>
+                <input
+                  className="purchase_supply-units"
+                  type="number"
+                  min={0}
+                  defaultValue={0}
+                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                />
+
+                {addVisible && addVisible.key === index && (
+                  <div className="optionBtnList link">
+                    <img
+                      src={agregar}
+                      alt="Afegir"
+                      title="Afegir"
+                      onClick={() => {
+                        fnAddSuply();
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {groupSelected === "2" && componentsProvidersData &&
+            componentsProvidersData.length > 0 &&
+            componentsProvidersData.map((item, index) => (
+              <div key={index} className="purchase_order-item">
+                <p className="purchase_supply-code">{item.componentReference}</p>
+                <p className="purchase_supply-description">
+                  {item.description}
+                </p>
+                <p className="purchase_supply-price">
+                  {item.price} {providerSelected.currency}
+                </p>
+                <input
+                  className="purchase_supply-units"
+                  type="number"
+                  min={0}
+                  defaultValue={0}
+                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                />
+
+                {addVisible && addVisible.key === index && (
+                  <div className="optionBtnList link">
+                    <img
+                      src={agregar}
+                      alt="Afegir"
+                      title="Afegir"
+                      onClick={() => {
+                        fnAddSuply();
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+
+
+            {groupSelected === "3" && productsProvidersData &&
+            productsProvidersData.length > 0 &&
+            productsProvidersData.map((item, index) => (
+              <div key={index} className="purchase_order-item">
+                <p className="purchase_supply-code">{item.productReference}</p>
+                <p className="purchase_supply-description">
+                  {item.description}
+                </p>
+                <p className="purchase_supply-price">
+                  {item.price} {providerSelected.currency}
+                </p>
+                <input
+                  className="purchase_supply-units"
+                  type="number"
+                  min={0}
+                  defaultValue={0}
+                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                />
+
+                {addVisible && addVisible.key === index && (
+                  <div className="optionBtnList link">
+                    <img
+                      src={agregar}
+                      alt="Afegir"
+                      title="Afegir"
+                      onClick={() => {
+                        fnAddSuply();
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {groupSelected === "4" && processesProvidersData &&
+            processesProvidersData.length > 0 &&
+            processesProvidersData.map((item, index) => (
+              <div key={index} className="purchase_order-item">
+                <p className="purchase_supply-code">{item.productReference}</p>
+                <p className="purchase_supply-description">
+                  {item.name}
                 </p>
                 <p className="purchase_supply-price">
                   {item.price} {providerSelected.currency}
