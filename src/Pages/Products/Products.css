@@ -1,6 +1,6 @@
-.component-detail-container input{
+/* .component-detail-container input{
     width: 30%;
-}
+} */
 .productsItemContainer{
     display: flex;
     flex-direction: column;

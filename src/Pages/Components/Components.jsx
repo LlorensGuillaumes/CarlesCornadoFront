@@ -9,6 +9,7 @@ import editar from "../../Images/icons/editar.png";
 import papelera from "../../Images/icons/papelera.png";
 import TreatyArray from "../../Shared/TreatyArray/Treatyarray";
 import DeleteConfirm from "../DeleteConfirm/DeleteConfirm";
+import ChangeCurrency from "../ChangeCurrency/ChangeCurrency";
 
 const Components = () => {
 const [componentsData, setComponentsData] = useState([]);
@@ -17,6 +18,10 @@ const [processesData, setProcessesData] = useState([]);
 const [componentDetailVisible, setComponentDetailVisible] = useState(false);
 const [componentSelected, setComponentSelected] = useState(null);
 const [showConfirm, setShowConfirm] = useState(false);
+const [showChageCurrency, setShowChangeCurrency] = useState(false);
+const [priceCalculate, setPriceCalculate] = useState([{name:"", price: "", currency:""}]);
+const [priceToChageCurrency, setPriceToChangeCurrency] = useState({name:'', value: '', currency:''})
+const [finalPrice, setFinalPrice] = useState();
 
 const [providersList, setProviderList] = useState([]);
 const [processesList, setProcessesList] = useState([]);
@@ -34,6 +39,11 @@ const [sanitaryComponentReference, setSanitaryComponentReference] =
 useState();
 const [description, setDescription] = useState();
 const [price, setPrice] = useState();
+const [providerPrice, setProviderPrice] = useState({
+idProvider: null,
+price: null,
+currency: null,
+});
 const [priceSale, setPriceSale] = useState();
 
 useEffect(() => {
@@ -92,11 +102,18 @@ setIsEdit(false);
 setIsNew(false);
 };
 
-const componentRelations = (event, relationId, relationName, item) => {
+const componentRelations = (event, relations, relationName, item) => {
 const isChecked = event;
 const relation = {
-    id: relationId,
+    id: relations._id,
     name: relationName,
+    price:
+    item === "provider"
+        ? providerPrice.idProvider === relations._id
+        ? providerPrice.price
+        : null
+        : relations.price,
+    currency: providerPrice.currency,
 };
 
 switch (item) {
@@ -104,21 +121,21 @@ switch (item) {
     isChecked
         ? setProviderList((prevList) => [...prevList, relation])
         : setProviderList((prevList) =>
-            prevList.filter((item) => item.id !== relationId)
+            prevList.filter((item) => item.id !== relations._id)
         );
     break;
     case "process":
     isChecked
         ? setProcessesList((prevList) => [...prevList, relation])
         : setProcessesList((prevList) =>
-            prevList.filter((item) => item.id !== relationId)
+            prevList.filter((item) => item.id !== relations._id)
         );
     break;
     case "component":
     isChecked
         ? setEquivalencesList((prevList) => [...prevList, relation])
         : setEquivalencesList((prevList) =>
-            prevList.filter((item) => item.id !== relationId)
+            prevList.filter((item) => item.id !== relations._id)
         );
     break;
     default:
@@ -165,9 +182,10 @@ const newComponent = {
     processes: TreatyArray.dropDuplicatesAndEmpty(
     processesList.map((item) => item.id)
     ),
-    providers: TreatyArray.dropDuplicatesAndEmpty(
-    providersList.map((item) => item.id)
-    ),
+    providers: providersList.map((item) => ({
+    providers: item.id,
+    price: item.price,
+    })),
 };
 
 {
@@ -225,17 +243,61 @@ switch (item) {
 };
 
 const dropComponent = (confirm) => {
-    if(confirm){
-        api.put(`/components/delete/${componentSelected._id}`)
-        .then((response)=>{
-            getComponents()
-            btnClose()
-        })
-    }
-    setShowConfirm(false);
-
+if (confirm) {
+    api
+    .put(`/components/delete/${componentSelected._id}`)
+    .then((response) => {
+        getComponents();
+        btnClose();
+    });
+}
+setShowConfirm(false);
 };
 
+const fnCalculatePriceCurrency = (isChecked, name, price, currency) => {
+    if(!isChecked){
+        const newPriceCalculate = priceCalculate.filter((item)=>(item.name !== name));
+            setPriceCalculate(newPriceCalculate.filter((item)=>(item.name !== '' && item.price!=='' && item.currency!=='')));  
+
+        
+    }else{
+        if(currency !== "€") {
+        setPriceToChangeCurrency({name: name, value:price, currency:currency})
+        setShowChangeCurrency(true);
+    } else{
+        fnCalculatePrice(name, price)
+    }
+    }
+    
+}
+const fnCalculatePrice = (name, price) => {
+    const newItemPrice = {
+        name: name,
+        price: price,
+        currency: '€',
+    }
+    setPriceCalculate([...priceCalculate, newItemPrice]);
+}
+
+useEffect(() => {
+    let acumulador = 0;
+    for (const item of priceCalculate) {
+        const itemPrice = parseFloat(item.price);
+        if (!isNaN(itemPrice)) {
+            acumulador += itemPrice;
+        }
+    }
+    const roundedTotal = acumulador.toFixed(2);
+    setFinalPrice(roundedTotal);
+
+}, [priceCalculate]);
+
+
+
+
+
+console.log(providersList);
+console.log(componentSelected);
 return (
 <div className="component">
     <div className="optionBtn">
@@ -304,51 +366,43 @@ return (
                 </div>
             </div>
             <div className="productsItemContainer">
-            <input
+                <input
                 defaultValue={
-                !isNew ? componentSelected.componentReference : ""
+                    !isNew ? componentSelected.componentReference : ""
                 }
                 placeholder="Referència"
                 onChange={(e) => {
-                setComponentReference(e.target.value);
+                    setComponentReference(e.target.value);
                 }}
                 className="text_input"
-            />
-            <input
+                />
+                <input
                 defaultValue={
-                !isNew ? componentSelected.sanitaryComponentReference : ""
+                    !isNew ? componentSelected.sanitaryComponentReference : ""
                 }
                 placeholder="Referència sanitària"
                 onChange={(e) => {
-                setSanitaryComponentReference(e.target.value);
+                    setSanitaryComponentReference(e.target.value);
                 }}
                 className="text_input"
-            />
-            <input
+                />
+                <input
                 defaultValue={!isNew ? componentSelected.description : ""}
                 placeholder="nom"
                 onChange={(e) => {
-                setDescription(e.target.value);
+                    setDescription(e.target.value);
                 }}
                 className="text_input"
-            />
-            <input
-            defaultValue={!isNew ? componentSelected.price : ""}
-            placeholder="preu"
-            onChange={(e) => {
-            setPrice(e.target.value);
-            }}
-            className="text_input"
-        />
-        <input
-        defaultValue={!isNew ? componentSelected.priceSale : ""}
-        placeholder="preu Venta"
-        onChange={(e) => {
-        setPriceSale(e.target.value);
-        }}
-        className="text_input"
-    />
-    </div>
+                />
+                <input
+                defaultValue={!isNew ? componentSelected.priceSale : ""}
+                placeholder="preu Venta"
+                onChange={(e) => {
+                    setPriceSale(e.target.value);
+                }}
+                className="text_input"
+                />
+            </div>
             <div className="headboard">
                 <p>Proveidors</p>
                 <p>Processos</p>
@@ -382,13 +436,28 @@ return (
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
-                                provider._id,
+                                provider,
                                 provider.name,
                                 "provider"
                             );
                             }}
                         />
-                        <p>{provider.name}</p>
+                        <p className="component_provider-item">
+                            {provider.name}
+                        </p>
+                        <input
+                            id="componentProviderPrice"
+                            type="text"
+                            placeholder="Preu"
+                            onChange={(e) => {
+                            setProviderPrice({
+                                idProvider: provider._id,
+                                price: e.target.value,
+                                currency: provider.currency,
+                            });
+                            }}
+                        />
+                        <p>{provider.currency}</p>
                         </div>
                     ))}
                 </div>
@@ -403,13 +472,16 @@ return (
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
-                                process._id,
+                                process,
                                 process.name,
                                 "process"
                             );
                             }}
                         />
-                        <p>{process.name}</p>
+                        <p className="component_process-item">
+                            {process.name}
+                        </p>
+                        <p id="componentProviderPrice">{process.price}€</p>
                         </div>
                     ))}
                 </div>
@@ -424,13 +496,15 @@ return (
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
-                                component._id,
+                                component,
                                 component.componentReference,
                                 "component"
                             );
                             }}
                         />
-                        <p>{component.componentReference}</p>
+                        <p className="component_equivalence-item">
+                            {component.componentReference}
+                        </p>
                         </div>
                     ))}
                 </div>
@@ -519,7 +593,11 @@ return (
                     providersList.length > 0 &&
                     providersList.map((provider, index) => (
                     <div className="list-check" key={index}>
-                        <p>{provider.name}</p>
+                        <p className="component_provider-item">
+                        {provider.name}
+                        </p>
+                        <p id="componentProviderPrice">{provider.price}</p>
+                        <p>{provider.currency}</p>
                     </div>
                     ))}
                 </div>
@@ -529,6 +607,7 @@ return (
                     processesList.map((process, index) => (
                     <div className="list-check" key={index}>
                         <p>{process.name}</p>
+                        <p>{process.price}</p>
                     </div>
                     ))}
                 </div>
@@ -541,11 +620,7 @@ return (
                     </div>
                     ))}
                 </div>
-                
             </div>
-    
-
-
             </div>
         ) : (
             <div className="component-detail-container">
@@ -584,13 +659,14 @@ return (
                 />
                 </div>
             </div>
+            <div className="detail_calculatePrice">
+            <div className="process_detail">
             <h1>{componentSelected.description}</h1>
             <h1>
                 {componentSelected.componentReference}{" "}
                 {componentSelected.sanitaryComponentReference &&
                 `(${componentSelected.sanitaryComponentReference})`}
             </h1>
-            <p>Preu compra: {componentSelected.price} €</p>
             <p>Preu venta: {componentSelected.priceSale} €</p>
 
             <h2>Equivalències</h2>
@@ -605,26 +681,58 @@ return (
             {componentSelected.providers &&
                 componentSelected.providers.length > 0 &&
                 componentSelected.providers.map((item, index) => (
-                <div key={index}>
-                    <p>{item.name}</p>
+                <div key={index} className="components_provider_list">
+                <input type="checkbox" onChange={(e)=>{fnCalculatePriceCurrency(e.target.checked, item.providers.name, item.price, item.providers.currency )}}/>
+                    <p>
+                    {item.providers.name} {item.price} {item.providers.currency}
+                    </p>
                 </div>
                 ))}
+
             <h2>Processos</h2>
             {componentSelected.processes &&
-                componentSelected.processes.length > 0 &&
-                componentSelected.processes.map((item, index) => (
-                <div key={index}>
-                    <p>{item.name}</p>
+            componentSelected.processes.length > 0 &&
+            componentSelected.processes.map((item, index) => (
+            <div key={index} className="processes_price_input">
+                <input type="checkbox" onChange={(e)=>{fnCalculatePriceCurrency(e.target.checked, item.name, item.price, item.currency )}}/>
+                <p>{item.name} {item.price} {item.currency}</p>
+            </div>
+            ))}
+            </div>
+            <div className="calculate_price">
+            <h3>Preu de cost: {finalPrice} €</h3>
+            <p>Els camps de benefici i Despeses d'empresa no fan res, pero veuràs que si selecciones proveidors i procesos l'import canvia</p>
+            <input type="text" placeholder="Despeses empresa"/>
+            <input type="text" placeholder="% benefici"/>
+            {priceCalculate && priceCalculate.length > 0 && priceCalculate.map((item, index)=>(
+                <div key={index}> 
+                <p>{item.name} {item.price} {item.currency}</p>
                 </div>
-                ))}
+            ))}
+            
+            </div>
+            </div>
+
+            
             </div>
         )}
         {showConfirm && (
             <DeleteConfirm
-            text = {componentSelected.componentReference} 
-            onAceptar = {() => dropComponent(true)}
-            onCancelar = {() => dropComponent(false)}
-        />)}
+            text={componentSelected.componentReference}
+            onAceptar={() => dropComponent(true)}
+            onCancelar={() => dropComponent(false)}
+            />
+        )}
+        {showChageCurrency && (
+            <ChangeCurrency
+            objectToChange={priceToChageCurrency}
+            onAceptar={(data) => {
+                fnCalculatePrice(data.name, data.value)
+                setShowChangeCurrency(false)
+            }}
+            onCancelar={() => setShowChangeCurrency(false)}
+            />
+        )}
         </div>
     )}
     </div>

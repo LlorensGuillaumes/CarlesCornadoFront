@@ -16,14 +16,8 @@ const [providersData, setProvidersData] = useState([]);
 const [isNew, setIsNew] = useState(false);
 const [isEdit, setIsEdit] = useState(false);
 const [processSelected, setProcessSelected] = useState(null);
-const [newProcessName, setNewProcessName] = useState("");
-const [newProcessProvider, setNewProcessProvider] = useState("");
-const [price, setPrice] = useState("");
-const [priceVisible, setPriceVisible] = useState(0);
-const [optionsVisible, setOptionsVisible] = useState({
-visible: false,
-id: "",
-});
+const [newProcess, setNewProcess] = useState();
+const [optionsVisible, setOptionsVisible] = useState(false);
 const [showConfirm, setShowConfirm] = useState(false);
 
 useEffect(() => {
@@ -63,12 +57,14 @@ if (isDelete) {
     setShowConfirm(true);
 } else {
     const newProcessToSave = {
-    name: processSelected.name,
-    providers: processSelected.providers,
-    price: processSelected.price,
+    name: newProcess.name,
+    providers: newProcess.providers._id,
+    currency: newProcess.providers.currency,
+    price: newProcess.price,
     };
 
     console.log(newProcessToSave);
+    setProcessesData(null)
     {
     isNew
         ? api.post("/processes/create", newProcessToSave).then((response) => {
@@ -83,7 +79,7 @@ if (isDelete) {
             });
     }
 }
-setOptionsVisible({ visible: false, id: "" });
+setOptionsVisible( false );
 };
 const dropProcess = (confirm) => {
 if (confirm) {
@@ -93,10 +89,12 @@ if (confirm) {
     });
 }
 setShowConfirm(false);
+setOptionsVisible(false)
 };
-console.log(processSelected);
-console.log(optionsVisible);
 
+console.log('edit', isEdit)
+console.log('new', isNew)
+console.log(processSelected)
 return (
 <div className="procesess">
     <div
@@ -121,9 +119,9 @@ return (
         >
             <p>{process.name}</p>
             {process.providers && <p>{process.providers.name}</p>}
-            {process.price && <p>{process.price}</p>}
+            {process.price && <p>{process.price}{process.currency}</p>}
             <div className="papelera-container">
-            {processSelected && processSelected._id === process._id && (
+            {optionsVisible && processSelected && processSelected._id === process._id && (
                 <div className="processes-options">
                 <img
                     src={papelera}
@@ -141,6 +139,7 @@ return (
                     className="link optionItem"
                     onClick={() => {
                     setIsEdit(true);
+                    setNewProcess(processSelected)
                     }}
                 />
                 <img
@@ -149,7 +148,10 @@ return (
                     title="Cancelar"
                     className="link optionItem"
                     onClick={() => {
-                    setOptionsVisible({ visible: false, id: "" });
+                    setOptionsVisible(false);
+                    setIsEdit(false);
+                    setIsNew(false);
+                    setProcessSelected(null)
                     }}
                 />
                 </div>
@@ -159,53 +161,65 @@ return (
         ))}
     </div>
 
-    {isEdit && (
+    {(isEdit || isNew) && (
     <div className="processes_modify">
         <input
         type="text"
-        defaultValue={processSelected.name}
-        onChange={(e) => 
-            setProcessSelected((prevProcessSelected) => ({
-                ...prevProcessSelected,
-                name: e.target.value,
-                }))
+        placeholder="Nom procès"
+        defaultValue={isEdit ? processSelected.name : ""}
+        onChange={(e) =>
+        setNewProcess((prevProcessSelected) => ({
+            ...prevProcessSelected,
+            name: e.target.value,
+        }))
         }
-        />
+    />
+
+
         <select
         className="process_select-provider"
-        value={
-            processSelected.providers
+        defaultValue={
+        processSelected
             ? processSelected.providers.name || ""
             : ""
         }
         onChange={(e) => {
-            setProcessSelected((prevProcessSelected) => ({
+        const selectedProvider = providersData.find(
+            (item) => item.name === e.target.value
+        );
+    
+        setNewProcess((prevProcessSelected) => ({
             ...prevProcessSelected,
-            providers: { name: e.target.value },
-            }))
-            e.target.value !== "Safident" ? setPriceVisible(true) : setPriceVisible(false);
+            providers: selectedProvider
+            ? {
+                _id: selectedProvider._id,
+                currency: selectedProvider.currency,
+                }
+            : { _id: "", name: "", currency: "" },
+        }));
         }}
-        >
+    >
         <option value="">Selecciona proveïdor</option>
         {providersData &&
-            providersData.length > 0 &&
-            providersData.map((item, index) => (
-            <option key={index} value={item.name}>
-                {item.name}
+        providersData.length > 0 &&
+        providersData.map((item, index) => (
+            <option key={index} value={`${item.name}`}>
+            {`${item.name}`}
             </option>
-            ))}
-        </select>
-        {priceVisible && processSelected.providers !== "Safident" &&
-            <input 
-                placeholder="Preu" 
-                onChange={(e) => {
-                    setProcessSelected((prevProcessSelected) => ({
-                        ...prevProcessSelected,
-                        price: e.target.value,
-                    }));
-                }}
-            />
-        }
+        ))}
+    </select>
+
+        <input
+        placeholder="Preu"
+        defaultValue={isEdit ? processSelected.price : ""}
+        onChange={(e) => {
+            setNewProcess((prevProcessSelected) => ({
+            ...prevProcessSelected,
+            price: e.target.value,
+            }));
+        }}
+        />
+        <p>{isEdit ? processSelected.providers.currency : ""}</p>
         <div className="buttons-box" id="processesBtnBox">
         <div className="optionBtn">
             <img
@@ -226,60 +240,14 @@ return (
             className="link"
             onClick={() => {
                 setIsEdit(false);
+                setIsNew(false);
             }}
             />
         </div>
         </div>
     </div>
     )}
-    {isNew && (
-    <div className="processes_modify">
-        <input
-        placeholder="Nou procés"
-        onChange={(e) => setNewProcessName(e.target.value)}
-        />
-        <select
-        className="process_select-provider"
-        onChange={(e) => {
-            setNewProcessProvider(e.target.value);
-            e.target.value !== "Safident" && setPriceVisible(true);
-        }}
-        >
-        <option>Selecciona proveïdor</option>
-        {providersData &&
-            providersData.length > 0 &&
-            providersData.map((item, index) => (
-            <option key={index}>{item.name}</option>
-            ))}
-        </select>
-        <div className="buttons-box" id="processesBtnBox">
-        <div className="optionBtn">
-            <img
-            src={aceptar}
-            title="Guardar"
-            alt="Guardar"
-            className="link"
-            onClick={() => {
-                setIsNew(false);
-                saveProcess();
-            }}
-            />
-        </div>
 
-        <div className="optionBtn">
-            <img
-            src={cancelar}
-            title="Cancelar"
-            alt="Cancelar"
-            className="link"
-            onClick={() => {
-                setIsNew(false);
-            }}
-            />
-        </div>
-        </div>
-    </div>
-    )}
     {showConfirm && (
     <DeleteConfirm
         text={processSelected.name}

@@ -37,8 +37,12 @@
 }
 .list-check{
     display: flex;
+    justify-content: space-between;
     width: 100%;
     margin-top: 0.5rem;
+}
+.list-check p {
+    width: 90%;
 }
 .optionsSelector{
     display: flex;
@@ -74,4 +78,41 @@
     padding: 0.2rem;
     border-radius: 2rem;
     border: none;
+}
+#componentProviderPrice{
+    border: none;
+    padding: 0px;
+    width: 20%;
+    text-align: center;
+}
+.component_provider-item{
+    width: 70%;
+}
+.component_process-item{
+    width: 70%;
+}
+.component_equivalence-item{
+    width: 92%;
+}
+.components_provider_list{
+    display: flex;
+}
+.components_provider_list p {
+    margin-left: 0.2rem;
+}
+.process_detail {
+    width: 50%;
+}
+.detail_calculatePrice{
+    display: flex;
+}
+.calculate_price{
+    display: flex;
+    flex-direction: column;
+}
+.processes_price_input{
+    display: flex;
+}
+.processes_price_input p {
+    margin-left: 0.2rem;
 }
