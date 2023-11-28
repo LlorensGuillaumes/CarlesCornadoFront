@@ -18,4 +18,37 @@
     display: flex;
     flex-direction: column;
     width: 70%;
+    padding: 0.5rem;
+}
+.providers_items {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem; 
+}
+.new_supply-check {
+    margin-right: 1rem;
+
+}
+.new_supply-name {
+    width: 55%;
+}
+.new_supply-price{
+    width: 20%;
+    padding: 0.2rem !important;
+    margin-right: 0.2rem;
+    margin-left: 0.2rem;
+}
+.providers_list{
+    display: flex;
+    margin-top: 2rem;
+}
+.providers_list-left{
+    width: 45%;
+}
+.providers_list-right{
+    width: 45%;
+    background-color: red;
+}
+.btnAgregar{
+    margin-left: 0.5rem;
 }
