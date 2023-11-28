@@ -32,7 +32,6 @@ const updatedPurchaseList = purchaseOrderData.map((order) => {
     const subtotal = item.price * item.units;
     return sum + subtotal;
     }, 0);
-    console.log(order);
     return {
     idOrder: order._id,
     orderNumber: order.orderNumber,
@@ -51,10 +50,8 @@ setPurchaseList(updatedPurchaseList);
 
 const getPurchaseOrders = () => {
 api.get("/purchases").then((response) => {
-    console.log(response)
     const sortedData = TreatyArray.alphabetical(response, "orderNumber");
     const reverseData = sortedData.reverse();
-    console.log(reverseData)
     setPurchaseOrderData(reverseData);
 });
 };
@@ -73,7 +70,6 @@ try {
     console.error("Error al generar el PDF:", error);
 }
 };
-console.log(purchaseOrderSelected)
 return (
 <div className="purchases">
     

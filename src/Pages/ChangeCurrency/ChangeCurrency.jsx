@@ -18,7 +18,6 @@ this.setState({
 };
 
 render() {
-    console.log(this.props)
 
 return (
     <div className="changeCurrency_popUp">

@@ -108,7 +108,6 @@ const Providers = () => {
   const getProcessesProviders = () => {
     api.get(`/processes/provider/${providerSelected._id}`)
     .then((response) => {
-      console.log(response)
       setProcessesProviderData(response)
     })    
   }
@@ -171,7 +170,6 @@ const Providers = () => {
     setShowConfirm(false);
   };
   const fnChangeUtis = (index, value, item) => {
-    console.log(item)
     {
       value >= 0
         ? setAddVisible({ key: index, units: value, id: item })

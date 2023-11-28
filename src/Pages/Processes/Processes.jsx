@@ -62,8 +62,6 @@ if (isDelete) {
     currency: newProcess.providers.currency,
     price: newProcess.price,
     };
-
-    console.log(newProcessToSave);
     setProcessesData(null)
     {
     isNew
@@ -92,9 +90,6 @@ setShowConfirm(false);
 setOptionsVisible(false)
 };
 
-console.log('edit', isEdit)
-console.log('new', isNew)
-console.log(processSelected)
 return (
 <div className="procesess">
     <div

@@ -144,29 +144,51 @@ switch (item) {
 };
 
 const selectComponent = (component) => {
-setComponentSelected(component);
-const equivalences = component.equivalences;
-const processes = component.processes;
-const providers = component.providers;
+    setComponentSelected(component);
 
-setProviderList([]);
-setProcessesList([]);
-setEquivalencesList([]);
+    const equivalences = component.equivalences;
+    const processes = component.processes;
+    const providers = component.providers;
 
-for (const equivalence of equivalences) {
-    componentRelations(
-    true,
-    equivalence._id,
-    equivalence.componentReference,
-    "component"
-    );
-}
-for (const process of processes) {
-    componentRelations(true, process._id, process.name, "process");
-}
-for (const provider of providers) {
-    componentRelations(true, provider._id, provider.name, "provider");
-}
+    setProviderList([]);
+    setProcessesList([]);
+    setEquivalencesList([]);
+
+    for (const equivalence of equivalences) {
+        setEquivalencesList(prevEquivalencesList => [
+            ...prevEquivalencesList,
+            {
+                id: equivalence._id,
+                name: equivalence.componentReference,
+                price: null,
+                currency: null,
+            }
+        ]);
+    }
+
+    for (const process of processes) {
+        setProcessesList(prevProcessesList => [
+            ...prevProcessesList,
+            {
+                id: process._id,
+                name: process.name,
+                price: process.price,
+                currency: process.currency,
+            }
+        ]);
+    }
+
+    for (const provider of providers) {
+        setProviderList(prevProvidersList => [
+            ...prevProvidersList,
+            {
+                id: provider.providers._id,
+                name: provider.providers.name,
+                price: provider.price,
+                currency: provider.providers.currency,
+            }
+        ]);
+    }
 };
 
 const newComponent = () => {
@@ -292,12 +314,6 @@ useEffect(() => {
 
 }, [priceCalculate]);
 
-
-
-
-
-console.log(providersList);
-console.log(componentSelected);
 return (
 <div className="component">
     <div className="optionBtn">
@@ -337,7 +353,7 @@ return (
 
     {componentDetailVisible && (
         <div className="">
-        {isEdit || isNew ? (
+        {(isEdit || isNew) ? (
             <div className="component-detail-container">
             {isNew ? <h1>NOU COMPONENT</h1> : <h1>MODIFICAR COMPONENT</h1>}
             <div className="buttons-box">
@@ -348,7 +364,8 @@ return (
                     className="link"
                     title="Guardar"
                     onClick={() => {
-                    newComponent();
+                    newComponent()
+                    setIsEdit(false)
                     }}
                 />
                 </div>
@@ -423,7 +440,7 @@ return (
                 />
             </div>
 
-            {isNew ? (
+            {(isNew || isEdit) && (
                 <div className="optionsSelector">
                 <div className="list-container">
                     {providersDataFiltered &&
@@ -433,6 +450,7 @@ return (
                         <input
                             type="checkbox"
                             className="checkbox-style"
+                            checked={providersList.some((item) => item.id === provider._id)}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -469,6 +487,7 @@ return (
                         <input
                             type="checkbox"
                             className="checkbox-style"
+                            checked={processesList.some((item) => item.id === process._id)}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -493,6 +512,7 @@ return (
                         <input
                             type="checkbox"
                             className="checkbox-style"
+                            checked={equivalencesList.some((item) => item.id === component._id)}
                             onChange={(e) => {
                             componentRelations(
                                 e.target.checked,
@@ -509,82 +529,83 @@ return (
                     ))}
                 </div>
                 </div>
-            ) : (
-                <div className="optionsSelector">
-                <div className="list-container">
-                    {providersDataFiltered &&
-                    providersDataFiltered.length > 0 &&
-                    providersDataFiltered.map((provider, index) => (
-                        <div className="list-check" key={index}>
-                        <input
-                            type="checkbox"
-                            className="checkbox-style"
-                            checked={providersList.some(
-                            (item) => item.id === provider._id
-                            )}
-                            onChange={(e) => {
-                            componentRelations(
-                                e.target.checked,
-                                provider._id,
-                                provider.name,
-                                "provider"
-                            );
-                            }}
-                        />
-                        <p>{provider.name}</p>
-                        </div>
-                    ))}
-                </div>
-                <div className="list-container">
-                    {processesDataFiltered &&
-                    processesDataFiltered.length > 0 &&
-                    processesDataFiltered.map((process, index) => (
-                        <div className="list-check" key={index}>
-                        <input
-                            type="checkbox"
-                            className="checkbox-style"
-                            checked={processesList.some(
-                            (item) => item.id === process._id
-                            )}
-                            onChange={(e) => {
-                            componentRelations(
-                                e.target.checked,
-                                process._id,
-                                process.name,
-                                "process"
-                            );
-                            }}
-                        />
-                        <p>{process.name}</p>
-                        </div>
-                    ))}
-                </div>
-                <div className="list-container">
-                    {equivalencesDataFiltered &&
-                    equivalencesDataFiltered.length > 0 &&
-                    equivalencesDataFiltered.map((component, index) => (
-                        <div className="list-check" key={index}>
-                        <input
-                            type="checkbox"
-                            className="checkbox-style"
-                            checked={equivalencesList.some(
-                            (item) => item.id === component._id
-                            )}
-                            onChange={(e) => {
-                            componentRelations(
-                                e.target.checked,
-                                component._id,
-                                component.componentReference,
-                                "component"
-                            );
-                            }}
-                        />
-                        <p>{component.componentReference}</p>
-                        </div>
-                    ))}
-                </div>
-                </div>
-            )}
+            )// : (
+            //     <div className="optionsSelector">
+            //     <div className="list-container">
+            //         {providersDataFiltered &&
+            //         providersDataFiltered.length > 0 &&
+            //         providersDataFiltered.map((provider, index) => (
+            //             <div className="list-check" key={index}>
+            //             <input
+            //                 type="checkbox"
+            //                 className="checkbox-style"
+            //                 checked={providersList.some(
+            //                 (item) => item.id === provider._id
+            //                 )}
+            //                 onChange={(e) => {
+            //                 componentRelations(
+            //                     e.target.checked,
+            //                     provider._id,
+            //                     provider.name,
+            //                     "provider"
+            //                 );
+            //                 }}
+            //             />
+            //             <p>{provider.name}</p>
+            //             </div>
+            //         ))}
+            //     </div>
+            //     <div className="list-container">
+            //         {processesDataFiltered &&
+            //         processesDataFiltered.length > 0 &&
+            //         processesDataFiltered.map((process, index) => (
+            //             <div className="list-check" key={index}>
+            //             <input
+            //                 type="checkbox"
+            //                 className="checkbox-style"
+            //                 checked={processesList.some(
+            //                 (item) => item.id === process._id
+            //                 )}
+            //                 onChange={(e) => {
+            //                 componentRelations(
+            //                     e.target.checked,
+            //                     process._id,
+            //                     process.name,
+            //                     "process"
+            //                 );
+            //                 }}
+            //             />
+            //             <p>{process.name}</p>
+            //             </div>
+            //         ))}
+            //     </div>
+            //     <div className="list-container">
+            //         {equivalencesDataFiltered &&
+            //         equivalencesDataFiltered.length > 0 &&
+            //         equivalencesDataFiltered.map((component, index) => (
+            //             <div className="list-check" key={index}>
+            //             <input
+            //                 type="checkbox"
+            //                 className="checkbox-style"
+            //                 checked={equivalencesList.some(
+            //                 (item) => item.id === component._id
+            //                 )}
+            //                 onChange={(e) => {
+            //                 componentRelations(
+            //                     e.target.checked,
+            //                     component._id,
+            //                     component.componentReference,
+            //                     "component"
+            //                 );
+            //                 }}
+            //             />
+            //             <p>{component.componentReference}</p>
+            //             </div>
+            //         ))}
+            //     </div>
+            //     </div>
+            // )
+        }
 
             <h2>SELECCIONATS</h2>
             <div className="optionsSelector">
@@ -608,6 +629,7 @@ return (
                     <div className="list-check" key={index}>
                         <p>{process.name}</p>
                         <p>{process.price}</p>
+                        <p>{process.currency}</p>
                     </div>
                     ))}
                 </div>
@@ -701,9 +723,6 @@ return (
             </div>
             <div className="calculate_price">
             <h3>Preu de cost: {finalPrice} €</h3>
-            <p>Els camps de benefici i Despeses d'empresa no fan res, pero veuràs que si selecciones proveidors i procesos l'import canvia</p>
-            <input type="text" placeholder="Despeses empresa"/>
-            <input type="text" placeholder="% benefici"/>
             {priceCalculate && priceCalculate.length > 0 && priceCalculate.map((item, index)=>(
                 <div key={index}> 
                 <p>{item.name} {item.price} {item.currency}</p>
