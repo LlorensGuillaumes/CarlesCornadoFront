@@ -6,10 +6,13 @@
 .supplies_item{
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     width: 20%;
     background-color: beige;
     margin: 1rem;
+    border-radius: 2rem;
+    padding: 1rem;
+    width: 30%;
 }
 
 .new_supply{
@@ -47,8 +50,39 @@
 }
 .providers_list-right{
     width: 45%;
-    background-color: red;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border: 1px solid black;
 }
 .btnAgregar{
     margin-left: 0.5rem;
+}
+.providers_list-item{
+    display: flex;
+    align-items: center;
+
+}
+.providers_list-name{
+    margin-right: 0.5rem;
+}
+.suply_text{
+    margin-right: 0.5rem;
+    width: 40%;
+}
+.suply_select-providers{
+    display: flex;
+    justify-content: center;
+}
+.supplies_code{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0px;
+}
+.supplies_providers{
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 1.5rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
 }

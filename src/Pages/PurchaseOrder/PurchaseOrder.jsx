@@ -50,6 +50,7 @@ setPurchaseList(updatedPurchaseList);
 
 const getPurchaseOrders = () => {
 api.get("/purchases").then((response) => {
+    console.log(response)
     const sortedData = TreatyArray.alphabetical(response, "orderNumber");
     const reverseData = sortedData.reverse();
     setPurchaseOrderData(reverseData);
@@ -163,7 +164,7 @@ return (
             purchaseOrderSelected.provisioning.map((item, index) => (
             <div key={index} className="order_list">
                 <p className="purchase-order_units">{item.units}x</p>
-                <p className="purchase-order_code">{item.idSuply.code}{item.idSuply.productReference}</p>
+                <p className="purchase-order_code">{item.idSuply.code}{item.idSuply.productReference}{item.idSuply.componentReference}</p>
                 <p className="purchase-order_name">{item.idSuply.description}</p>
                 <p className="purchase-order_price">{item.price}{purchaseOrderSelected.provider.currency}</p>
                 <p className="purchase-order_price">{item.units * item.price}{purchaseOrderSelected.provider.currency}</p>

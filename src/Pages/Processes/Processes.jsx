@@ -40,6 +40,7 @@ const getProviders = () => {
 api
     .get("/providers")
     .then((response) => {
+        const procesessProviders = response.filter((item)=>(item.family.processes))
     setProvidersData(TreatyArray.alphabetical(response, "name"));
     })
     .catch((error) => {
@@ -104,7 +105,9 @@ return (
     <div className="processes-list">
     {processesData &&
         processesData.length > 0 &&
-        processesData.map((process, index) => (
+        processesData
+        .filter(process => !process.idDeleted)
+        .map((process, index) => (
         <div
             key={index}
             className="procesess-item link"
@@ -197,7 +200,9 @@ return (
         <option value="">Selecciona proveïdor</option>
         {providersData &&
         providersData.length > 0 &&
-        providersData.map((item, index) => (
+        providersData
+        .filter(provider => !provider.idDeleted)
+        .map((item, index) => (
             <option key={index} value={`${item.name}`}>
             {`${item.name}`}
             </option>

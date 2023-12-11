@@ -77,7 +77,8 @@ const getProviders = () => {
 api
     .get("/providers")
     .then((response) => {
-    setprovidersData(arraySort.alphabetical(response, "name"));
+        const componentProviders = response.filter((item)=>(item.family.components))
+    setprovidersData(arraySort.alphabetical(componentProviders, "name"));
     })
     .catch((error) => {
     console.log(error);
@@ -109,7 +110,6 @@ setIsNew(false);
 };
 
 const componentRelations = (event, relations, relationName, item) => {
-    console.log(relations)
 const isChecked = event;
 const relation = {
     id: relations._id,
@@ -154,6 +154,8 @@ switch (item) {
 
 const selectComponent = (component) => {
 setComponentSelected(component);
+setPriceCalculate([{ name: "", price: "", currency: "" }]);
+setFinalPrice();
 
 const equivalences = component.equivalences;
 const processes = component.processes;
@@ -351,7 +353,9 @@ return (
     <div className="component-container">
     {componentsData &&
         componentsData.length > 0 &&
-        componentsData.map((component, index) => (
+        componentsData
+        .filter(component => !component.idDeleted)
+        .map((component, index) => (
         <div
             key={index}
             className="components-container_component link"
@@ -461,7 +465,9 @@ return (
                     <div className="list-container">
                     {providersDataFiltered &&
                         providersDataFiltered.length > 0 &&
-                        providersDataFiltered.map((provider, index) => (
+                        providersDataFiltered
+                        .filter(provider => !provider.isDeleted)
+                        .map((provider, index) => (
                         <div className="list-check" key={index}>
                             <input
                             type="checkbox"
@@ -500,7 +506,9 @@ return (
                     <div className="list-container">
                     {processesDataFiltered &&
                         processesDataFiltered.length > 0 &&
-                        processesDataFiltered.map((process, index) => (
+                        processesDataFiltered
+                        .filter(process => !process.isDeleted)
+                        .map((process, index) => (
                         <div className="list-check" key={index}>
                             <input
                             type="checkbox"
@@ -530,7 +538,9 @@ return (
                     <div className="list-container">
                     {equivalencesDataFiltered &&
                         equivalencesDataFiltered.length > 0 &&
-                        equivalencesDataFiltered.map((component, index) => (
+                        equivalencesDataFiltered
+                        .filter(component => !component.isDeleted)
+                        .map((component, index) => (
                         <div className="list-check" key={index}>
                             <input
                             type="checkbox"

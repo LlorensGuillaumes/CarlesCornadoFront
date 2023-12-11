@@ -17,9 +17,7 @@ const [supplySelected, setSupplySelected] = useState(null);
 const [code, setCode] = useState("");
 const [description, setDescription] = useState("");
 const [price, setPrice] = useState({index: null, price: null});
-const [providers, setProviders] = useState([
-{ idProvider: null, price: null },
-]);
+const [providers, setProviders] = useState([]);
 const [optionsVisible, setOptionsVisible] = useState({
 visible: false,
 id: "",
@@ -48,7 +46,8 @@ const getProviders = () => {
 api
     .get("/providers")
     .then((response) => {
-    setProvidersData(arraySort.alphabetical(response, "name"));
+        const suppliesProviders = response.filter((item)=>(item.family.provisioning))
+    setProvidersData(arraySort.alphabetical(suppliesProviders, "name"));
     })
     .catch((error) => {
     console.log(error);
@@ -88,10 +87,16 @@ if (isDelete) {
             });
     }
 }
-setOptionsVisible({ visible: false, id: "" });
+setOptionsVisible({ visible: false, id: "" })
+setIsNew(false);
+setIsEdit(false)
+setProviders(false)
+setPrice({index: null, price: null})
 };
-
-console.log(providersData);
+const fnSelectSupply = (supply) => {
+    setSupplySelected(supply);
+    setProviders(supply.Providers)
+}
 return (
 <div className="procesess">
     <div
@@ -111,27 +116,29 @@ return (
     <div className="processes-list">
     {suppliesData &&
         suppliesData.length > 0 &&
-        suppliesData.map((supply, index) => (
+        suppliesData
+        .filter(supply => !supply.idDeleted)
+        .map((supply, index) => (
         <div
             key={index}
-            className="procesess-item link"
+            className="supplies_item link"
             onClick={() => {
-            setSupplySelected(supply);
+            fnSelectSupply(supply);
             }}
         >
-            <p>{supply.description}</p>
-            <p>{supply.code}</p>
+            <h3 className="supplies_code">{supply.description}</h3>
+            <h3 className="supplies_code">{supply.code}</h3>
+            <h4 className="supplies_providers">Proveïdors</h4>
             {supply.providers &&
             supply.providers.length > 0 &&
             supply.providers.map((provider, index) => (
-                <div key={index}>
-                <p>{provider.name}</p>
-                <p>{provider.price}</p>
+                <div key={index} className="supplies_providers">
+                <p>{provider.idProvider.name}: {provider.price} {provider.currency}</p>
                 </div>
             ))}
-            <div className="papelera-container">
             {optionsVisible.visible && optionsVisible.id === supply._id && (
-                <div className="processes-options">
+                <div className="buttons-box buttons-box-supplies-container">
+                <div className="buttons-box-supplies">
                 <img
                     src={papelera}
                     alt="eliminar"
@@ -141,6 +148,8 @@ return (
                     saveSupplies(true);
                     }}
                 />
+                </div>
+                <div className="buttons-box-supplies">
                 <img
                     src={editar}
                     alt="editar"
@@ -149,8 +158,11 @@ return (
                     onClick={() => {
                     getProviders();
                     setIsEdit(true);
+                    setIsNew(false)
                     }}
                 />
+                </div>
+                <div className="buttons-box-supplies">
                 <img
                     src={cancelar}
                     alt="cacelar"
@@ -161,59 +173,15 @@ return (
                     }}
                 />
                 </div>
+                
+                </div>
             )}
-            </div>
         </div>
         ))}
     </div>
     {(isEdit || isNew) && (
     <div className="new_supply">
         <h1>{isEdit ? "MODIFICAR" : "NOU APROVISIONAMENT"}</h1>
-        <input
-        type="text"
-        placeholder="Codi"
-        defaultValue={supplySelected ? supplySelected.code : ""}
-        onChange={(e) => setCode(e.target.value)}
-        />
-        <input
-        type="text"
-        placeholder="Aprovisionament"
-        defaultValue={supplySelected ? supplySelected.description : ""}
-        onChange={(e) => setDescription(e.target.value)}
-        />
-        <div className="providers_list">
-        <div className="providers_list-left">
-        {providersData &&
-        providersData.length > 0 &&
-        providersData.map((provider, index) => (
-            <div key={index} className="providers_items">
-            <p 
-                value={provider._id}
-                className="new_supply-name"
-                >{provider.name}</p>
-            <input 
-                type="text" 
-                placeholder="Preu" 
-                className="new_supply-price"
-                onChange={(e)=>{setPrice({index: index, price:e.target.value})}}
-                />
-                <p>{provider.currency}</p>
-                <div className="optionBtnList">
-                <img 
-                className="link btnAgregar"
-                src={agregar} 
-                alt="Afegir" 
-                title="Afegir"/>
-                </div>
-            </div>
-            
-        ))}
-        </div>
-        <div className="providers_list-right"></div>
-
-        
-        </div>
-
         <div className="buttons-box">
             <div className="optionBtn">
             <img
@@ -234,65 +202,91 @@ return (
                 className="link"
                 onClick={() => {
                 setIsEdit(false);
+                setIsNew(false);
                 }}
             />
             </div>
         </div>
-    </div>
-    )}
-    {isEdit && (
-    <div className="new_supply">
-        <h1>NOU APROVISIONAMENT</h1>
+        <div className="onLineText">
         <input
-        className="text_input"
+        type="text"
         placeholder="Codi"
+        defaultValue={supplySelected ? supplySelected.code : ""}
         onChange={(e) => setCode(e.target.value)}
+        className="suply_code"
         />
         <input
-        className="text_input"
-        placeholder="Nom"
+        type="text"
+        placeholder="Aprovisionament"
+        defaultValue={supplySelected ? supplySelected.description : ""}
         onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-        className="text_input"
-        placeholder="Preu"
-        onChange={(e) => setPrice(e.target.value)}
-        />
-        <select onChange={(e) => setProviders(e.target.value)}>
-        <option>proveidor</option>
+        className="suply_text"
+        />        
+        </div>
+        
+        <div className="providers_list">
+        <div className="providers_list-left">
         {providersData &&
-            providersData.length > 0 &&
-            providersData.map((item, index) => (
-            <option key={index} value={item._id}>
-                {item.name}
-            </option>
-            ))}
-        </select>
-
-        <div className="optionBtn">
-        <img
-            src={aceptar}
-            title="Guardar"
-            alt="Guardar"
-            className="link"
-            onClick={() => {
-            setIsNew(false);
-            saveSupplies();
-            }}
-        />
+        providersData.length > 0 &&
+        providersData
+        .filter(provider => !provider.idDeleted && provider.family.provisioning)
+        .map((provider, index) => (
+            <div key={index} className="providers_items">
+            <p 
+                value={provider._id}
+                className="new_supply-name"
+                >{provider.name}</p>
+            <input 
+                type="text" 
+                placeholder="Preu" 
+                className="new_supply-price"
+                onChange={(e)=>{setPrice({index: index, price:e.target.value})}}
+                />
+                <p>{provider.currency}</p>
+                {price && price.index === index && 
+            <div className="optionBtnList">
+                <img 
+                className="link btnAgregar"
+                src={agregar} 
+                alt="Afegir" 
+                title="Afegir"
+                onClick={()=>{
+                    setProviders((prevProviders) => [
+                        ...prevProviders,
+                        { idProvider: provider._id, providerName: provider.name, price: price.price, currency: provider.currency },
+                        ]);
+                }}
+                    />
+                </div>
+                
+                }
+            </div>
+            
+        ))}
+        </div>
+        <div className="providers_list-right">
+        <h3 className="suply_select-providers">PROVEÏDORS SELECCIONATS</h3>
+        {providers && providers.length > 0 && providers.map((provider, index)=>(
+            <div key={index} className="providers_list-item">
+            <p className="providers_list-name">{provider.providerName}</p>
+            <p>{provider.price} {provider.currency}</p>
+            <div className="optionBtnList">
+                <img 
+                className="link btnAgregar"
+                src={papelera} 
+                alt="Afegir" 
+                title="Afegir"
+                onClick={() => setProviders(prevProviders => prevProviders.filter(item => item.idProvider !== provider.idProvider))}
+                    />
+                </div>
+            </div>
+        ))}
         </div>
 
-        <div className="optionBtn">
-        <img
-            src={cancelar}
-            title="Cancelar"
-            alt="Cancelar"
-            className="link"
-            onClick={() => {
-            setIsNew(false);
-            }}
-        />
+        
         </div>
+
+        
     </div>
     )}
 </div>

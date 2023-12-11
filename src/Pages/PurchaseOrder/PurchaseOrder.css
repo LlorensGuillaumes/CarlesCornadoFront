@@ -5,14 +5,14 @@
 }
 .purchases_list{
     display: flex;
-    width: 70%;
+    width: 100%;
     background-color: rgb(204, 202, 202);
     padding: 0.3rem;
 
 }
 .purchases_list-item{
     display: flex;
-    width: 70%;
+    width: 100%;
     padding: 0.3rem;
 }
 .purchase_number{
@@ -105,7 +105,7 @@ width: 10%;
     background-color: rgb(190, 188, 188);
 }
 .order_list{
-    width: 90%;
+    width: 100%;
 }
 .purchase-order_total{
     margin-left: 76%;

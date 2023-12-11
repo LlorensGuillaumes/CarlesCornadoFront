@@ -45,3 +45,12 @@ input {
   padding: 0.5rem;
   height: 1.2rem;
 }
+
+.buttons-box-supplies{
+  width: 15%;
+}
+.buttons-box-supplies-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

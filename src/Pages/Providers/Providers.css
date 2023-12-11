@@ -26,11 +26,11 @@ flex-wrap: wrap;
     flex-direction: column;
     padding: 2rem;
     padding-left: 5rem;
-    width: 70%;
+    width: 80%;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0px;
+    left: 10px;
+    /* transform: translate(-50%, -50%); */
     z-index: 5;
     background-color: beige;
     border-radius: 2rem;
@@ -67,8 +67,7 @@ flex-wrap: wrap;
     display: flex;
     align-items: center;
     padding-top: 0.3rem;
-    width: 70%;
-    margin-bottom: 3rem;
+    width: 90%;
 }
 .sendOptions-box{
     display: flex;
@@ -88,10 +87,10 @@ flex-wrap: wrap;
 }
 
 .purchase_supply-code{
-    width: 20%;
+    width: 30%;
 }
 .purchase_supply-description{
-    width: 35%;
+    width: 55%;
 }
 .purchase_supply-price{
     width: 15%;
@@ -127,9 +126,10 @@ flex-wrap: wrap;
     display: flex;
     flex-direction: column;
     border: solid 1px black;
-    width: 30%;
+    width: fit-content;
     margin-top: 1rem;
     padding-left: 1rem;
+    padding-right: 1rem;
     padding-bottom: 1rem;
 }
 .selectGroup{
@@ -142,4 +142,83 @@ flex-wrap: wrap;
 }
 .selectGroupItem input{
     margin-right: 0.2rem;
+}
+.providers_families{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+    width: fit-content;
+    margin-top: 1rem;
+}
+.providers_families-group{
+    display: flex;
+    align-items: center;
+}
+.providers_families-item{
+    display: flex;
+    align-items: center;
+    
+}
+.providers_families-item-text{
+    margin-right: 2rem !important;
+}
+.name_input{
+    width: 30%;
+}
+.cif_input{
+    width: 20%;
+}
+.email_input{
+    width: 30%;
+}
+.phone_input{
+    width: 30%;
+}
+.address_input{
+    width: 50%;
+}
+.cp_input{
+    width: 10%;
+}
+.city_input{
+    width: 30%;
+}
+.country_input{
+    width: 30%;
+}
+.shipmentFree_input{
+    width: 30%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+}
+.shipmentFree_input input{
+    margin-left: 1rem;
+}
+.select_input{
+    width: 30%;
+    display: flex;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+    border-radius: 2rem;
+    border: none;
+    padding-left: 0.3rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+.currency_input{
+    width: 15%;
+    display: flex;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+}
+.observations_input{
+    width: 30%;
+}
+.onLineText{
+    display: flex;
+    align-items: center;
 }

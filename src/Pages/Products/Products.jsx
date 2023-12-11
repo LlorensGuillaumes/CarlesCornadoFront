@@ -67,7 +67,6 @@ getProviders();
 
 const getProducts = () => {
 api.get("/products").then((response) => {
-    console.log(response)
     setProductsData(arraySort.alphabetical(response, "productReference"));
 });
 };
@@ -88,7 +87,8 @@ const getProviders = () => {
 api
     .get("/providers")
     .then((response) => {
-    setprovidersData(arraySort.alphabetical(response, "name"));
+        const productProviders = response.filter((item)=>(item.family.products))
+    setprovidersData(arraySort.alphabetical(productProviders, "name"));
     })
     .catch((error) => {
     console.log(error);
@@ -133,7 +133,6 @@ useEffect(() => {
     }, [priceCalculate]);
 
 const componentRelations = (event, relations, relationName, item) => {
-    console.log(relations, item)
 const isChecked = event;
 const relation = {
     id: relations._id,
@@ -187,8 +186,9 @@ switch (item) {
 };
 
 const selectComponent = (product) => {
-    console.log(product);
     setProductSelected(product);
+    setPriceCalculate([{ name: "", price: "", currency: "" }]);
+    setFinalPrice();
 
     const equivalences = product.equivalences;
     const processes = product.processes;
@@ -199,11 +199,6 @@ const selectComponent = (product) => {
     setProcessesList([]);
     setEquivalencesList([]);
     setComponentsList([]);
-
-    console.log('equivalences', equivalences);
-    console.log('processes', processes);
-    console.log('providers', providers);
-    console.log('components', components);
 
     const equivalencesList = equivalences.map((equivalence) => ({
         id: equivalence._id,
@@ -263,7 +258,6 @@ const newProduct = {
     ),
     priceSale: priceSale,
 };
-console.log(newProduct)
 {
     isNew
     ? api.post("/products/create", newProduct).then((response) => {
@@ -370,10 +364,7 @@ const newItemPrice = {
 };
 setPriceCalculate([...priceCalculate, newItemPrice]);
 };
-console.log(providersList)
-console.log(processesList)
-console.log(equivalencesList)
-console.log(componentsList)
+
 return (
 <div className="component">
     <div className="optionBtn">
@@ -396,7 +387,9 @@ return (
     <div className="component-container">
     {productsData &&
         productsData.length > 0 &&
-        productsData.map((product, index) => (
+        productsData
+        .filter(product => !product.idDeleted)
+        .map((product, index) => (
         <div
             key={index}
             className="components-container_component link"
@@ -519,7 +512,9 @@ return (
                     <div className="list-container">
                     {providersDataFiltered &&
                         providersDataFiltered.length > 0 &&
-                        providersDataFiltered.map((provider, index) => (
+                        providersDataFiltered
+                        .filter(provider => !provider.idDeleted)
+                        .map((provider, index) => (
                         <div className="list-check" key={index}>
                             <input
                             type="checkbox"

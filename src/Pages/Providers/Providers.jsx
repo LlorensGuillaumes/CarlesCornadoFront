@@ -3,6 +3,7 @@ import "./Providers.css";
 import api from "../../Shared/API/api";
 import agregar from "../../Images/icons/agregar.png";
 import cancelar from "../../Images/icons/cancelar.png";
+import aceptar from "../../Images/icons/aceptar.png";
 import papelera from "../../Images/icons/papelera.png";
 import editar from "../../Images/icons/editar.png";
 import order from "../../Images/icons/order.png";
@@ -47,6 +48,11 @@ const Providers = () => {
   const [shipmentFree, setShipmentFree] = useState(false);
   const [currency, setCurrency] = useState("€");
   const [language, setLanguage] = useState("Català");
+  const [familyComponents, setFamilyComponents] = useState(true);
+  const [familyProducts, setFamilyProducts] = useState(true);
+  const [familyProvisioning, setFamilyProvisioning] = useState(true);
+  const [familyProcesses, setFamilyProcesses] = useState(true);
+  const [findPrice, setFindPrice] = useState();
 
   useEffect(() => {
     getProviders();
@@ -83,44 +89,66 @@ const Providers = () => {
     api
       .get(`/provisioning/provider/${providerSelected._id}`)
       .then((response) => {
+        const provisioningProvider = (response.map(item => {
+          const providersFiltrados = item.providers.filter(provider => provider.idProvider._id === providerSelected._id);
+          return {
+            _id:item._id,
+            code: item.code,
+            description: item.description,
+            providers: providersFiltrados
+          };
+        }).filter(item => item.providers.length > 0))
         setSuppliesProviderData(
-          TreatyArray.alphabetical(response, "description")
+          TreatyArray.alphabetical(provisioningProvider, "description")
         );
       });
   };
 
-  const getComponentsProviders = () =>{
-    api
-      .get(`/components/provider/${providerSelected._id}`)
-      .then((response) => {
-        setComponentsProvidersData(
-          TreatyArray.alphabetical(response, "description")
-        );
-      });
-  }
-  const getProductsProviders = () =>{
-    api.get(`/products/provider/${providerSelected._id}`)
-    .then((response)=> {
-      setProductsProvidersData(response)
-    })
-  }
+  const getComponentsProviders = () => {
+    api.get(`/components/provider/${providerSelected._id}`).then((response) => {
+      setComponentsProvidersData(
+        TreatyArray.alphabetical(response, "description")
+      );
+    });
+  };
+  const getProductsProviders = () => {
+    api.get(`/products/provider/${providerSelected._id}`).then((response) => {
+      setProductsProvidersData(response);
+    });
+  };
 
   const getProcessesProviders = () => {
-    api.get(`/processes/provider/${providerSelected._id}`)
-    .then((response) => {
-      setProcessesProviderData(response)
-    })    
-  }
+    api.get(`/processes/provider/${providerSelected._id}`).then((response) => {
+      setProcessesProviderData(response);
+    });
+  };
 
   const btnClose = () => {
     setProviderDetailVisible(false);
     setIsEdit(false);
     setIsNew(false);
+    setFamilyComponents(true);
+    setFamilyProducts(true);
+    setFamilyProvisioning(true);
+    setFamilyProcesses(true);
   };
 
   const fnChangeGroupSelected = (option) => {
     setGroupSelected(option);
   };
+  useEffect(() => {
+    if (
+      !familyComponents &&
+      !familyProcesses &&
+      !familyProducts &&
+      !familyProvisioning
+    ) {
+      setFamilyComponents(true);
+      setFamilyProcesses(true);
+      setFamilyProducts(true);
+      setFamilyProvisioning(true);
+    }
+  }, [familyComponents, familyProcesses, familyProducts, familyProvisioning]);
 
   const saveProvider = (drop = false) => {
     const newProvider = {
@@ -137,6 +165,12 @@ const Providers = () => {
       sendObservations: sendObservationsList,
       language: language,
       currency: currency,
+      family: {
+        components: familyComponents,
+        products: familyProducts,
+        provisioning: familyProvisioning,
+        processes: familyProcesses,
+      },
     };
 
     if (drop) {
@@ -169,7 +203,16 @@ const Providers = () => {
     }
     setShowConfirm(false);
   };
-  const fnChangeUtis = (index, value, item) => {
+  const fnChangeUnits = (index, value, item) => {
+    if (groupSelected === '1'){
+      const actualProvider = item.providers.find((provider)=>(provider.idProvider._id === providerSelected._id))
+      setFindPrice(actualProvider.price)
+    }
+    if (groupSelected === '3'){
+      const actualProvider = item.providers.find((provider)=>(provider.providers === providerSelected._id))
+      // setFindPrice(actualProvider.priceSale)
+    }
+    
     {
       value >= 0
         ? setAddVisible({ key: index, units: value, id: item })
@@ -180,20 +223,32 @@ const Providers = () => {
     const newItem = {
       id: addVisible.id._id,
       units: addVisible.units,
-      price: addVisible.id.price,
-      code: groupSelected === "1" ? 
-            addVisible.id.code : 
-            groupSelected === '2' ?
-            addVisible.id.componentReference :
-            groupSelected === "3" ? 
-            addVisible.id.productReference : "",
+      price: groupSelected === '1' 
+          ? findPrice
+          : groupSelected === '2'
+          ? addVisible.id.priceSale
+          : groupSelected === '3'
+          ? addVisible.id.priceSale
+          : groupSelected === '4'
+          ? addVisible.id.priceSale
+          :"",
+      code:
+        groupSelected === "1"
+          ? addVisible.id.code
+          : groupSelected === "2"
+          ? addVisible.id.componentReference
+          : groupSelected === "3"
+          ? addVisible.id.productReference
+          : "",
       name: addVisible.id.description,
-      type: groupSelected === "1" ? 
-            'provisioning' : 
-            groupSelected === "2" ?
-            'components' :
-            groupSelected === "3" ? 
-            'products' : "",
+      type:
+        groupSelected === "1"
+          ? "provisioning"
+          : groupSelected === "2"
+          ? "components"
+          : groupSelected === "3"
+          ? "products"
+          : "",
     };
 
     const purchaseItemsNotActual = purchaseOrderItems.filter(
@@ -201,7 +256,6 @@ const Providers = () => {
     );
     setPurchaseOrderItems([...purchaseItemsNotActual, newItem]);
   };
-
   const fnSaveOrder = () => {
     const actualDate = new Date();
     const day = actualDate.getDate();
@@ -247,6 +301,19 @@ const Providers = () => {
       setPurchaseSendObservations(sendObservationsWithoutSendObservation);
     }
   };
+
+  const fnSelectProvider = (provider) => {
+    setProviderSelected(provider);
+    setPurchaseOrderItems([]);
+    if(provider.family){
+      setFamilyComponents(provider.family.components);
+      setFamilyProcesses(provider.family.processes);
+      setFamilyProducts(provider.family.products);
+      setFamilyProvisioning(provider.family.provisioning);
+    } else {
+      
+    }
+  }
   return (
     <div className="provider">
       <div
@@ -261,12 +328,14 @@ const Providers = () => {
       <div className="provider-container">
         {providersData &&
           providersData.length > 0 &&
-          providersData.map((item, index) => (
+          providersData
+          .filter(provider => !provider.idDeleted)
+          .map((item, index) => (
             <div
               key={index}
               className="provider-container_item link"
               onClick={() => {
-                setProviderSelected(item);
+                fnSelectProvider(item);
                 setProviderDetailVisible(true);
                 irA.top();
               }}
@@ -281,16 +350,94 @@ const Providers = () => {
         <div className="">
           {isEdit || isNew ? (
             <div className="provider-detail-container">
-              <div></div>
-
               {isNew ? <h1>NOU PROVEÏDOR</h1> : <h1>MODIFICAR PROVEÏDOR</h1>}
+              <div className="buttons-box">
+              <div>
+              <img 
+              className="link"
+              src={guardar} 
+              alt="Guardar" 
+              title="Guardar"
+              onClick={() => {
+                saveProvider();
+              }}
+              />
+              </div>
+              <div>
+              <img 
+              className="link"
+              src={cancelar} 
+              alt="Cancelar" 
+              title="Cancelar"
+              onClick={() => {
+                btnClose();
+              }}
+              />
+              </div>
+              </div>
+              <div className="providers_families">
+                <h3>Families</h3>
+                <div className="providers_families-group">
+                  <div className="providers_families-item">
+                    <input
+                      type="checkbox"
+                      checked={
+                        familyProvisioning
+                      }
+                      onChange={(e) => {
+                        setFamilyProvisioning(e.target.checked);
+                      }}
+                    />
+                    <p className="providers_families-item-text">
+                      Aprovisionaments
+                    </p>
+                  </div>
+                  <div className="providers_families-item">
+                    <input
+                      type="checkbox"
+                      checked={
+                          familyComponents
+                      }
+                      onChange={(e) => {
+                        setFamilyComponents(e.target.checked);
+                      }}
+                    />
+                    <p className="providers_families-item-text">Components</p>
+                  </div>
+                  <div className="providers_families-item">
+                    <input
+                      type="checkbox"
+                      checked={
+                        familyProducts
+                      }
+                      onChange={(e) => {
+                        setFamilyProducts(e.target.checked);
+                      }}
+                    />
+                    <p className="providers_families-item-text">Productes</p>
+                  </div>
+                  <div className="providers_families-item">
+                    <input
+                      type="checkbox"
+                      checked={
+                        familyProcesses
+                      }
+                      onChange={(e) => {
+                        setFamilyProcesses(e.target.checked);
+                      }}
+                    />
+                    <p className="providers_families-item-text">Processos</p>
+                  </div>
+                </div>
+              </div>
+              <div className="onLineText">
               <input
                 defaultValue={!isNew ? providerSelected.name : ""}
                 placeholder="Proveïdor"
                 onChange={(e) => {
                   setProviderName(e.target.value);
                 }}
-                className="text_input"
+                className="text_input name_input"
               />
               <input
                 defaultValue={
@@ -300,15 +447,18 @@ const Providers = () => {
                 onChange={(e) => {
                   setTaxIdentificationNumber(e.target.value);
                 }}
-                className="text_input"
+                className="text_input cif_input"
               />
+              
+              </div>
+              
               <input
                 defaultValue={!isNew ? providerSelected.email : ""}
                 placeholder="Email"
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
-                className="text_input"
+                className="text_input email_input"
               />
               <input
                 defaultValue={!isNew ? providerSelected.phone : ""}
@@ -316,7 +466,7 @@ const Providers = () => {
                 onChange={(e) => {
                   setPhone(e.target.value);
                 }}
-                className="text_input"
+                className="text_input phone_input"
               />
               <input
                 defaultValue={!isNew ? providerSelected.address : ""}
@@ -324,15 +474,16 @@ const Providers = () => {
                 onChange={(e) => {
                   setAddress(e.target.value);
                 }}
-                className="text_input"
+                className="text_input address_input"
               />
+              <div className="onLineText">
               <input
                 defaultValue={!isNew ? providerSelected.cityCode : ""}
                 placeholder="CP"
                 onChange={(e) => {
                   setCityCode(e.target.value);
                 }}
-                className="text_input"
+                className="text_input cp_input"
               />
               <input
                 defaultValue={!isNew ? providerSelected.city : ""}
@@ -340,7 +491,7 @@ const Providers = () => {
                 onChange={(e) => {
                   setCity(e.target.value);
                 }}
-                className="text_input"
+                className="text_input city_input"
               />
               <input
                 defaultValue={!isNew ? providerSelected.country : ""}
@@ -348,10 +499,12 @@ const Providers = () => {
                 onChange={(e) => {
                   setCountry(e.target.value);
                 }}
-                className="text_input"
+                className="text_input country_input"
               />
-              <label>
-                enviament Gratuït:
+              </div>
+              
+              <label className="shipmentFree_input">
+                Enviament Gratuït:
                 <input
                   type="checkbox"
                   defaultChecked={
@@ -366,7 +519,10 @@ const Providers = () => {
                   }}
                 />
               </label>
+              <div className="onLineText">
               <select
+              className="select_input"
+              defaultValue={providerSelected ? providerSelected.language : ''}
                 onChange={(e) => {
                   setLanguage(e.target.value);
                 }}
@@ -375,30 +531,37 @@ const Providers = () => {
                 <option>Català</option>
                 <option>Anglès</option>
               </select>
-              <select onChange={(e) => setCurrency(e.target.value)}>
-                <option>Selecciona moneda</option>
+              <select 
+              className="select_input currency_input"
+              defaultValue={providerSelected ? providerSelected.currency : ''}
+              onChange={(e) => setCurrency(e.target.value)}>
+                <option>Moneda</option>
                 <option>€</option>
                 <option>$</option>
                 <option>CHF</option>
               </select>
+              
+              </div>
+              
               <input
                 defaultValue={!isNew ? providerSelected.observation : ""}
                 placeholder="Observacions"
                 onChange={(e) => {
                   setObservation(e.target.value);
                 }}
-                className="text_input"
+                className="text_input observations_input"
               />
+              <div className="onLineText">
               <input
                 defaultValue={!isNew ? providerSelected.observation : ""}
                 placeholder="Observacions d'enviament"
                 onChange={(e) => {
                   setSendObservations(e.target.value);
                 }}
-                className="text_input"
+                className="text_input observations_input"
               />
               <div
-                className="optionBtn link"
+                className="optionBtnList link"
                 onClick={() => {
                   setSendObservationsList((prev) => [
                     ...prev,
@@ -406,7 +569,9 @@ const Providers = () => {
                   ]);
                 }}
               >
-                <img src={agregar} alt="Agregar" title="Afegir observació" />
+                <img src={agregar} alt="Agregar" title="Afegir observació" />              
+              </div>
+              
               </div>
               {sendObservationsList &&
                 sendObservationsList.length > 0 &&
@@ -428,27 +593,62 @@ const Providers = () => {
                   </div>
                 ))}
 
-              <button
-                className="link provider_detail_button"
-                onClick={() => {
-                  saveProvider();
-                }}
-              >
-                Guardar
-              </button>
-              <button
-                className="link provider_detail_button"
-                onClick={() => {
-                  btnClose();
-                }}
-              >
-                Tancar
-              </button>
+ 
             </div>
           ) : (
             <div className="provider-detail-container">
-              <h1>{providerSelected.name}</h1>
+            <div className="buttons-box">
+            <div className="optionBtn">
+              <img
+                src={editar}
+                alt="Editar"
+                title="Editar"
+                className="link"
+                onClick={() => {
+                  setIsEdit(true);
+                }}
+              />
+            </div>
+            <div className="optionBtn">
+              <img
+                src={cancelar}
+                alt="Cancelar"
+                title="Cancelar"
+                className="link"
+                onClick={() => {
+                  btnClose();
+                }}
+              />
+            </div>
 
+            <div className="optionBtn">
+              <img
+                className="link"
+                src={order}
+                alt="Ordre de compra"
+                title="Ordre de compra"
+                onClick={() => {
+                  setPurchaseOrderVisible(true);
+                  getSuppliesProviders();
+                  getComponentsProviders();
+                  getProductsProviders();
+                  getProcessesProviders();
+                }}
+              />
+            </div>
+            <div className="optionBtn">
+              <img
+                src={papelera}
+                alt="Eliminar"
+                title="Eliminar"
+                className="link"
+                onClick={() => {
+                  saveProvider(true);
+                }}
+              />
+            </div>
+          </div>
+              <h1>{providerSelected.name}</h1>
               <div className="provider_detail-container">
                 <p>NIF - CIF: {providerSelected.taxIdentificationNumber}</p>
                 <p>Email: {providerSelected.email}</p>
@@ -459,7 +659,25 @@ const Providers = () => {
                   ({providerSelected.country})
                 </p>
                 <p>Observacions: {providerSelected.observation}</p>
-
+                <div>
+                </div>
+                <div className="providers_families">
+                <h3>Families</h3>
+                <div className="providers_families-group">
+                  <div className="providers_families-item">
+                    {providerSelected.family.provisioning && <p className="providers_families-item-text">Aprovisionaments</p>}
+                  </div>
+                  <div className="providers_families-item">
+                    {providerSelected.family.components && <p className="providers_families-item-text">Components</p>}
+                  </div>
+                  <div className="providers_families-item">
+                  {providerSelected.family.products && <p className="providers_families-item-text">Productes</p>}
+                  </div>
+                  <div className="providers_families-item">
+                  {providerSelected.family.processes && <p className="providers_families-item-text">Processos</p>}
+                  </div>
+                </div>
+              </div>
                 <div className="provider_options-detail">
                   <h3>Configuració</h3>
                   <div className="shipmentFree_item">
@@ -480,57 +698,7 @@ const Providers = () => {
                     </div>
                   ))}
               </div>
-              <div className="buttons-box">
-                <div className="optionBtn">
-                  <img
-                    src={editar}
-                    alt="Editar"
-                    title="Editar"
-                    className="link"
-                    onClick={() => {
-                      setIsEdit(true);
-                    }}
-                  />
-                </div>
-                <div className="optionBtn">
-                  <img
-                    src={cancelar}
-                    alt="Cancelar"
-                    title="Cancelar"
-                    className="link"
-                    onClick={() => {
-                      btnClose();
-                    }}
-                  />
-                </div>
 
-                <div className="optionBtn">
-                  <img
-                    className="link"
-                    src={order}
-                    alt="Ordre de compra"
-                    title="Ordre de compra"
-                    onClick={() => {
-                      setPurchaseOrderVisible(true);
-                      getSuppliesProviders();
-                      getComponentsProviders();
-                      getProductsProviders();
-                      getProcessesProviders();
-                    }}
-                  />
-                </div>
-                <div className="optionBtn">
-                  <img
-                    src={papelera}
-                    alt="Eliminar"
-                    title="Eliminar"
-                    className="link"
-                    onClick={() => {
-                      saveProvider(true);
-                    }}
-                  />
-                </div>
-              </div>
               {showConfirm && (
                 <DeleteConfirm
                   text={providerSelected.name}
@@ -587,6 +755,7 @@ const Providers = () => {
               ))}
           </div>
           <div className="selectGroup">
+          {suppliesProviderData && suppliesProviderData.length > 0 && 
             <label className="selectGroupItem">
               <input
                 type="radio"
@@ -598,8 +767,10 @@ const Providers = () => {
               />
               Aprovisionaments
             </label>
+          }
 
-            <label className="selectGroupItem">
+          {componentsProvidersData && componentsProvidersData.length > 0 &&
+          <label className="selectGroupItem">
               <input
                 type="radio"
                 value="2"
@@ -610,8 +781,10 @@ const Providers = () => {
               />
               Components
             </label>
-
-            <label className="selectGroupItem">
+          }
+            
+          {productsProvidersData && productsProvidersData.length > 0 && 
+          <label className="selectGroupItem">
               <input
                 type="radio"
                 value="3"
@@ -622,7 +795,10 @@ const Providers = () => {
               />
               Productes
             </label>
-            <label className="selectGroupItem">
+          }
+          
+          {processesProvidersData && processesProvidersData.length > 0 && 
+          <label className="selectGroupItem">
               <input
                 type="radio"
                 value="4"
@@ -633,9 +809,12 @@ const Providers = () => {
               />
               Processos
             </label>
+          }
+            
           </div>
 
-          {groupSelected === "1" && suppliesProviderData &&
+          {groupSelected === "1" &&
+            suppliesProviderData &&
             suppliesProviderData.length > 0 &&
             suppliesProviderData.map((item, index) => (
               <div key={index} className="purchase_order-item">
@@ -644,14 +823,14 @@ const Providers = () => {
                   {item.description}
                 </p>
                 <p className="purchase_supply-price">
-                  {item.price} {providerSelected.currency}
+                  {item.providers[0].price} {providerSelected.currency}
                 </p>
                 <input
                   className="purchase_supply-units"
                   type="number"
                   min={0}
                   defaultValue={0}
-                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                  onChange={(e) => fnChangeUnits(index, e.target.value, item)}
                 />
 
                 {addVisible && addVisible.key === index && (
@@ -668,24 +847,27 @@ const Providers = () => {
                 )}
               </div>
             ))}
-            
-            {groupSelected === "2" && componentsProvidersData &&
+
+          {groupSelected === "2" &&
+            componentsProvidersData &&
             componentsProvidersData.length > 0 &&
             componentsProvidersData.map((item, index) => (
               <div key={index} className="purchase_order-item">
-                <p className="purchase_supply-code">{item.componentReference}</p>
+                <p className="purchase_supply-code">
+                  {item.componentReference}
+                </p>
                 <p className="purchase_supply-description">
                   {item.description}
                 </p>
                 <p className="purchase_supply-price">
-                  {item.price} {providerSelected.currency}
+                  {item.priceSale} {providerSelected.currency}
                 </p>
                 <input
                   className="purchase_supply-units"
                   type="number"
                   min={0}
                   defaultValue={0}
-                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                  onChange={(e) => fnChangeUnits(index, e.target.value, item)}
                 />
 
                 {addVisible && addVisible.key === index && (
@@ -703,8 +885,8 @@ const Providers = () => {
               </div>
             ))}
 
-
-            {groupSelected === "3" && productsProvidersData &&
+          {groupSelected === "3" &&
+            productsProvidersData &&
             productsProvidersData.length > 0 &&
             productsProvidersData.map((item, index) => (
               <div key={index} className="purchase_order-item">
@@ -713,14 +895,14 @@ const Providers = () => {
                   {item.description}
                 </p>
                 <p className="purchase_supply-price">
-                  {item.price} {providerSelected.currency}
+                  {item.priceSale} {providerSelected.currency}
                 </p>
                 <input
                   className="purchase_supply-units"
                   type="number"
                   min={0}
                   defaultValue={0}
-                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                  onChange={(e) => fnChangeUnits(index, e.target.value, item)}
                 />
 
                 {addVisible && addVisible.key === index && (
@@ -738,14 +920,13 @@ const Providers = () => {
               </div>
             ))}
 
-            {groupSelected === "4" && processesProvidersData &&
+          {groupSelected === "4" &&
+            processesProvidersData &&
             processesProvidersData.length > 0 &&
             processesProvidersData.map((item, index) => (
               <div key={index} className="purchase_order-item">
                 <p className="purchase_supply-code">{item.productReference}</p>
-                <p className="purchase_supply-description">
-                  {item.name}
-                </p>
+                <p className="purchase_supply-description">{item.name}</p>
                 <p className="purchase_supply-price">
                   {item.price} {providerSelected.currency}
                 </p>
@@ -754,7 +935,7 @@ const Providers = () => {
                   type="number"
                   min={0}
                   defaultValue={0}
-                  onChange={(e) => fnChangeUtis(index, e.target.value, item)}
+                  onChange={(e) => fnChangeUnits(index, e.target.value, item)}
                 />
 
                 {addVisible && addVisible.key === index && (
