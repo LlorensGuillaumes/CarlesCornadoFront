@@ -87,7 +87,7 @@ return (
         <p className="purchase_number">{item.orderNumber}</p>
         <p className="purchase_date">{item.date}</p>
         <p className="purchase_provider">{item.provider.name || ""}</p>
-        <p className="purchase_total">{item.total}{item.currency}</p>
+        <p className="purchase_total">{item.total} {item.currency}</p>
         <div
             className="optionBtnList link"
             onClick={() => {
@@ -101,7 +101,7 @@ return (
 
     {purchaseOrderSelected && purchaseOrderSelected.provider && (
     <div className="order_detail">
-    <div>
+    <div className="buttons-box">
     <div className="optionBtn link" onClick={()=>{generatePDF()}}>
     <img src={pdf} alt="Decarregar" title="Descarregar"/>
     </div>
@@ -166,11 +166,11 @@ return (
                 <p className="purchase-order_units">{item.units}x</p>
                 <p className="purchase-order_code">{item.idSuply.code}{item.idSuply.productReference}{item.idSuply.componentReference}</p>
                 <p className="purchase-order_name">{item.idSuply.description}</p>
-                <p className="purchase-order_price">{item.price}{purchaseOrderSelected.provider.currency}</p>
-                <p className="purchase-order_price">{item.units * item.price}{purchaseOrderSelected.provider.currency}</p>
+                <p className="purchase-order_price">{item.price} {purchaseOrderSelected.provider.currency}</p>
+                <p className="purchase-order_price">{item.units * item.price} {purchaseOrderSelected.provider.currency}</p>
             </div>
             ))}
-            <h3 className="purchase-order_total">TOTAL: {purchaseOrderSelected.total}{purchaseOrderSelected.provider.currency}</h3>
+            <h3 className="purchase-order_total">TOTAL: {purchaseOrderSelected.total} {purchaseOrderSelected.provider.currency}</h3>
             <h3>{purchaseOrderSelected.sendObservations}</h3> 
             <p className="purchase-order_nota">
             {purchaseOrderSelected.provider.language === "Català" ? 
