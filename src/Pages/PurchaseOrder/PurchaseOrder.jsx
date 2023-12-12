@@ -50,7 +50,6 @@ setPurchaseList(updatedPurchaseList);
 
 const getPurchaseOrders = () => {
 api.get("/purchases").then((response) => {
-    console.log(response)
     const sortedData = TreatyArray.alphabetical(response, "orderNumber");
     const reverseData = sortedData.reverse();
     setPurchaseOrderData(reverseData);

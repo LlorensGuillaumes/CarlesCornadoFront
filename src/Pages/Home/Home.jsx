@@ -10,6 +10,7 @@ return (
     <div className={`link home_item ${itemSelected === 1 ? 'selected' : null}`}>
     <h3 onClick={()=>{
         setItemSelected(1)
+        navigate('/customers')
     }}>CLIENTS</h3>
     </div>
     <div className={`link home_item ${itemSelected === 2 ? 'selected' : null}`}>
