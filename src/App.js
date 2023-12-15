@@ -11,6 +11,7 @@ import Suplies from "./Pages/Supplies/Suplies";
 import PurchaseOrder from "./Pages/PurchaseOrder/PurchaseOrder";
 import AssemblyOrder from "./Pages/AssemblyOrder/AssemblyOrder";
 import Customers from "./Pages/Customers/Customers";
+import ShippingOrder from "./Pages/ShippingOrder/ShippingOrder";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/purchase_order" element={<PurchaseOrder />} />
             <Route path="/assembly_order" element={<AssemblyOrder/>}/>
             <Route path="/customers" element={<Customers/>}/>
+            <Route path="/shipping_orders" element={<ShippingOrder/>}/>
           </Routes>
         </div>
       </div>

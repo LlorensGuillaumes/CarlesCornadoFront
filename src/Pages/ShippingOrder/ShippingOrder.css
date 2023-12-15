@@ -1,0 +1,39 @@
+.shippingOrder-container{
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+
+}
+.shippingOrder-items{
+    display: flex;
+    gap: 0.5rem;
+}
+.shippingOrder_detail{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+    border-top: solid 1px black;
+    padding: 1rem;
+}
+.shippingOrder_detail_item{
+    display: flex;
+    width: 70%;
+    flex-direction: column;
+    position: absolute;
+    background-color: beige;
+    padding: 2rem;
+    border-radius: 2rem;
+}
+.shippingOrder_detail_processes{
+    display: flex;
+    
+}
+.shippinOrder_state_change{
+    display: flex;
+    gap: 1rem;
+}
+.shippinOrder_state_change label{
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}

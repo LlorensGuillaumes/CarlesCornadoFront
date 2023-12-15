@@ -6,6 +6,12 @@ img{
   object-fit: contain;
   object-position: center;
 }
+h4{
+  margin-block: 0px;
+}
+h3{
+  margin-block: 0px;
+}
 .optionBtn{
   width: 3rem;
 }
